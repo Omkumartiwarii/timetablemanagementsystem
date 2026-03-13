@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>TimeTable Management System Assistant</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+      }
+
+      body {
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+      }
+
+      /* CHATBOX */
+
+      .msger {
+        width: 420px;
+        height: 550px;
+        background: white;
+        border-radius: 15px;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+      }
+
+      /* HEADER */
+
+      .msger-header {
+        background: linear-gradient(135deg, #2563eb, #3b82f6);
+        color: white;
+        padding: 16px;
+        text-align: center;
+        font-size: 18px;
+        font-weight: 500;
+      }
+
+      /* CHAT AREA */
+
+      .msger-chat {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        background: #f8fafc;
+      }
+
+      .msger-chat::-webkit-scrollbar {
+        width: 5px;
+      }
+
+      .msger-chat::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+      }
+
+      /* MESSAGE */
+
+      .msg {
+        display: flex;
+        margin-bottom: 15px;
+      }
+
+      .msg-img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-size: cover;
+        margin-right: 10px;
+      }
+
+      /* BUBBLE */
+
+      .msg-bubble {
+        padding: 12px 16px;
+        border-radius: 15px;
+        max-width: 70%;
+        font-size: 14px;
+      }
+
+      /* BOT */
+
+      .left-msg .msg-bubble {
+        background: #e2e8f0;
+        color: #1e293b;
+      }
+
+      /* USER */
+
+      .right-msg {
+        flex-direction: row-reverse;
+      }
+
+      .right-msg .msg-bubble {
+        background: #2563eb;
+        color: white;
+      }
+
+      .right-msg .msg-img {
+        margin-left: 10px;
+        margin-right: 0;
+      }
+
+      /* INPUT AREA */
+
+      .msger-inputarea {
+        display: flex;
+        border-top: 1px solid #eee;
+        padding: 10px;
+        background: #fff;
+      }
+
+      .msger-input {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        outline: none;
+        font-size: 14px;
+        background: #f1f5f9;
+        border-radius: 8px;
+      }
+
+      .msger-send-btn {
+        margin-left: 10px;
+        background: #2563eb;
+        color: white;
+        border: none;
+        padding: 12px 18px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      .msger-send-btn:hover {
+        background: #1e40af;
+      }
+    </style>
+  </head>
+
+  <body>
+    <section class="msger">
+      <header class="msger-header">TimeTable Management System Assistant 🤖</header>
+
+      <main class="msger-chat">
+        <div class="msg left-msg">
+          <div
+            class="msg-img"
+            style="
+              background-image: url(&quot;https://cdn-icons-png.flaticon.com/512/4712/4712107.png&quot;);
+            "
+          ></div>
+
+          <div class="msg-bubble">
+            Hello 👋 Welcome to TimeTable Management System Assistant! Ask me
+            anything about timetable generation.
+          </div>
+        </div>
+      </main>
+
+      <form class="msger-inputarea">
+        <input
+          type="text"
+          class="msger-input"
+          id="textInput"
+          placeholder="Ask something about TimeTable Management System..."
+        />
+
+        <button type="submit" class="msger-send-btn">Send</button>
+      </form>
+    </section>
+
+    <script>
+      const msgerForm = document.querySelector(".msger-inputarea");
+      const msgerInput = document.querySelector(".msger-input");
+      const msgerChat = document.querySelector(".msger-chat");
+
+      const BOT_IMG = "https://cdn-icons-png.flaticon.com/512/4712/4712107.png";
+      const PERSON_IMG =
+        "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+
+      const BOT_NAME = "TimeTable Management System Bot";
+      const PERSON_NAME = "You";
+
+      msgerForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const msgText = msgerInput.value;
+
+        if (!msgText) return;
+
+        appendMessage(PERSON_NAME, PERSON_IMG, "right", msgText);
+
+        msgerInput.value = "";
+
+        botResponse(msgText);
+      });
+
+      function appendMessage(name, img, side, text) {
+        const msgHTML = `
+<div class="msg ${side}-msg">
+
+<div class="msg-img" style="background-image:url(${img})"></div>
+
+<div class="msg-bubble">
+${text}
+</div>
+
+</div>
+`;
+
+        msgerChat.insertAdjacentHTML("beforeend", msgHTML);
+
+        msgerChat.scrollTop += 500;
+      }
+
+      function botResponse(rawText) {
+        $.get("/get", { msg: rawText }).done(function (data) {
+          appendMessage(BOT_NAME, BOT_IMG, "left", data);
+        });
+      }
+    </script>
+  </body>
+</html>

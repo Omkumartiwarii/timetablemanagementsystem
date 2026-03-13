@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>TimeTable Management System | Contact Us</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap");
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+      }
+
+      body {
+        background: linear-gradient(135deg, #1e3a8a, #2563eb, #38bdf8);
+        min-height: 100vh;
+      }
+
+      /* NAVBAR */
+
+      .navbar {
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      }
+
+      .navbar-brand {
+        font-weight: 600;
+        font-size: 20px;
+      }
+
+      /* MAIN SECTION */
+
+      .contact-section {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 120px 20px;
+      }
+
+      .contact-wrapper {
+        width: 1100px;
+        display: grid;
+        grid-template-columns: 40% 60%;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      }
+
+      /* LEFT SIDE */
+
+      .contact-info {
+        background: #0f172a;
+        color: white;
+        padding: 50px;
+      }
+
+      .contact-info h2 {
+        margin-bottom: 30px;
+        font-weight: 600;
+      }
+
+      .contact-info ul {
+        list-style: none;
+      }
+
+      .contact-info li {
+        display: flex;
+        margin-bottom: 20px;
+        align-items: center;
+        font-size: 15px;
+      }
+
+      .contact-info i {
+        font-size: 20px;
+        margin-right: 15px;
+        color: #38bdf8;
+      }
+
+      /* SOCIAL */
+
+      .social-icons {
+        margin-top: 30px;
+      }
+
+      .social-icons a {
+        color: white;
+        margin-right: 15px;
+        font-size: 22px;
+        transition: 0.3s;
+      }
+
+      .social-icons a:hover {
+        color: #38bdf8;
+      }
+
+      /* RIGHT SIDE FORM */
+
+      .contact-form {
+        background: white;
+        padding: 50px;
+      }
+
+      .contact-form h2 {
+        margin-bottom: 30px;
+        color: #1e293b;
+        font-weight: 600;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-control {
+        border-radius: 8px;
+        padding: 12px;
+        border: 1px solid #ddd;
+        transition: 0.3s;
+      }
+
+      .form-control:focus {
+        border-color: #2563eb;
+        box-shadow: none;
+      }
+
+      textarea {
+        resize: none;
+        height: 120px;
+      }
+
+      /* BUTTON */
+
+      .btn-send {
+        background: linear-gradient(135deg, #2563eb, #3b82f6);
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: 0.3s;
+      }
+
+      .btn-send:hover {
+        background: linear-gradient(135deg, #1e40af, #2563eb);
+      }
+
+      /* MOBILE */
+
+      @media (max-width: 900px) {
+        .contact-wrapper {
+          grid-template-columns: 1fr;
+        }
+
+        .contact-info {
+          text-align: center;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- NAVBAR -->
+
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+      <a class="navbar-brand" href="#"><b>TimeTable Management System</b></a>
+
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#nav"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="nav">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'index' %}">Home</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'about' %}">About</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'help' %}">Help</a>
+          </li>
+
+          <li class="nav-item active">
+            <a class="nav-link" href="{% url 'contact' %}">Contact</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'login' %}">Login</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'register' %}">Sign Up</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- CONTACT SECTION -->
+
+    <section class="contact-section">
+      <div class="contact-wrapper">
+        <!-- LEFT SIDE -->
+
+        <div class="contact-info">
+          <h2>Contact Information</h2>
+
+          <ul>
+            <li>
+              <i class="fa fa-map-marker-alt"></i>
+              Bihar, Sheohar, India
+            </li>
+
+            <li>
+              <i class="fa fa-envelope"></i>
+              contact@timetablemanagementsystem.com
+            </li>
+
+            <li>
+              <i class="fa fa-phone"></i>
+              +91 1234567890
+            </li>
+          </ul>
+
+          <div class="social-icons">
+            <a href="#"><i class="fab fa-facebook"></i></a>
+            <a href="#"><i class="fab fa-youtube"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+          </div>
+        </div>
+
+        <!-- RIGHT SIDE -->
+
+        <div class="contact-form">
+          <h2>Send Message</h2>
+
+          <form method="post" action="{% url 'contact' %}">
+            {% csrf_token %}
+
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="First Name"
+                  required
+                />
+              </div>
+
+              <div class="form-group col-md-6">
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Last Name"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <input
+                  type="email"
+                  class="form-control"
+                  placeholder="Email Address"
+                  required
+                />
+              </div>
+
+              <div class="form-group col-md-6">
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Mobile Number"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <textarea
+                class="form-control"
+                placeholder="Write your message..."
+                required
+              ></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-send">Send Message</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>

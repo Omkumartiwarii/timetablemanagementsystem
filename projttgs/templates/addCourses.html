@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>TimeTable Management System | Dashboard</title>
+
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="https://use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* GLOBAL */
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+      }
+
+      body {
+        background: #eef2f7;
+        color: #333;
+      }
+
+      /* NAVBAR */
+
+      .navbar {
+        background: linear-gradient(135deg, #0f172a, #1e3a8a);
+        padding: 12px 40px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .navbar-brand {
+        font-size: 20px;
+        font-weight: 600;
+      }
+
+      .nav-link {
+        margin-left: 15px;
+        font-weight: 500;
+        transition: 0.3s;
+      }
+
+      .nav-link:hover {
+        color: #38bdf8 !important;
+        transform: scale(1.05);
+      }
+
+      /* PAGE TITLE */
+
+      h2 {
+        margin-top: 110px;
+        text-align: center;
+        font-weight: 600;
+        color: #0f172a;
+      }
+
+      h5 {
+        text-align: center;
+        color: #64748b;
+        margin-bottom: 40px;
+      }
+
+      /* FORM */
+
+      form {
+        display: flex;
+        justify-content: center;
+      }
+
+      fieldset {
+        width: 750px;
+        background: white;
+        padding: 40px;
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        transition: 0.3s;
+      }
+
+      fieldset:hover {
+        transform: translateY(-5px);
+      }
+
+      /* FORM LABEL */
+
+      fieldset label {
+        display: block;
+        font-weight: 500;
+        margin-bottom: 5px;
+        margin-top: 15px;
+      }
+
+      /* INPUT */
+
+      fieldset input,
+      fieldset select {
+        width: 100%;
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+        background: #f8fafc;
+        transition: 0.3s;
+      }
+
+      fieldset input:focus,
+      fieldset select:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+        background: white;
+      }
+
+      /* BUTTON */
+
+      .submit {
+        display: inline-block;
+        margin-top: 20px;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        color: white;
+        padding: 12px 25px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-size: 15px;
+        transition: 0.3s;
+      }
+
+      .submit:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      /* EDIT BUTTON */
+
+      a .submit {
+        background: #0f172a;
+      }
+
+      a .submit:hover {
+        background: #020617;
+      }
+
+      /* DROPDOWN */
+
+      .dropdown-menu {
+        border-radius: 10px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      /* MULTI SELECT */
+
+      .dropdown-check-list .anchor {
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        background: #f8fafc;
+        width: 100%;
+      }
+
+      .dropdown-check-list ul.items {
+        background: white;
+        border-radius: 8px;
+        padding: 10px;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      /* MOBILE */
+
+      @media (max-width: 768px) {
+        fieldset {
+          width: 90%;
+          padding: 25px;
+        }
+
+        .navbar {
+          padding: 10px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <nav class="navbar navbar-expand-md navbar-dark fixed-top">
+        <a class="navbar-brand" href="#"><b>TimeTable Management System</b></a>
+
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-toggle="collapse"
+          data-target="#navbarCollapse"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'admindash' %}">Get Started</a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'addInstructors' %}"
+                >Add Teachers</a
+              >
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'addRooms' %}">Add Rooms</a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'addTimings' %}">Add Timings</a>
+            </li>
+
+            <li class="nav-item active">
+              <a class="nav-link" href="{% url 'addCourses' %}">Add Courses</a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'addDepts' %}"
+                >Add Departments</a
+              >
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'addSections' %}"
+                >Add Sections</a
+              >
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'generate' %}"
+                >Generate Timetable</a
+              >
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link">|</a>
+            </li>
+
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" data-toggle="dropdown">
+                Welcome, {{ user.first_name }}
+              </a>
+
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="{% url 'password_change' %}">
+                  Change Password
+                </a>
+
+                <a class="dropdown-item" href="{% url 'logout' %}"> Logout </a>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </header>
+
+    {% block content %} {% load static %}
+
+    <h2>Add Courses</h2>
+
+    <h5>
+      Please use the following form to enter the Courses into the system for
+      timetable generation
+    </h5>
+
+    <form method="post">
+      {% csrf_token %}
+
+      <fieldset>
+        <div class="tabcontent" id="new">
+          {{ form.as_p }}
+
+          <a href="{% url 'editcourse' %}">
+            <h1 class="submit">View / Edit Courses</h1>
+          </a>
+
+          <input type="submit" value="Add Courses" class="submit" />
+        </div>
+      </fieldset>
+    </form>
+
+    {% endblock %}
+  </body>
+</html>

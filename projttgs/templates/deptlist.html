@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>TimeTable Management System | Dashboard</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap");
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+      }
+
+      body {
+        background: linear-gradient(135deg, #0f172a, #1e3a8a, #2563eb);
+        display: flex;
+        min-height: 100vh;
+        color: #333;
+      }
+
+      /* SIDEBAR */
+
+      .sidebar {
+        width: 250px;
+        background: #0f172a;
+        color: white;
+        padding: 30px 20px;
+        position: fixed;
+        height: 100%;
+      }
+
+      .sidebar h2 {
+        font-size: 22px;
+        margin-bottom: 30px;
+      }
+
+      .sidebar a {
+        display: block;
+        color: #cbd5f5;
+        text-decoration: none;
+        margin: 12px 0;
+        padding: 10px;
+        border-radius: 6px;
+        transition: 0.3s;
+      }
+
+      .sidebar a:hover {
+        background: #2563eb;
+        color: white;
+      }
+
+      /* MAIN AREA */
+
+      .main {
+        margin-left: 250px;
+        width: 100%;
+      }
+
+      /* TOPBAR */
+
+      .topbar {
+        background: white;
+        padding: 15px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .topbar h3 {
+        color: #1e293b;
+      }
+
+      .user {
+        font-weight: 500;
+      }
+
+      /* CONTENT */
+
+      .content {
+        padding: 40px;
+      }
+
+      /* CARD */
+
+      .card {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      }
+
+      /* TITLE */
+
+      .card h2 {
+        margin-bottom: 20px;
+        color: #1e293b;
+      }
+
+      /* BUTTON */
+
+      .back-btn {
+        display: inline-block;
+        background: #2563eb;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 6px;
+        text-decoration: none;
+        margin-bottom: 20px;
+      }
+
+      .back-btn:hover {
+        background: #1e40af;
+      }
+
+      /* TABLE */
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      thead {
+        background: #2563eb;
+        color: white;
+      }
+
+      th {
+        padding: 14px;
+        text-align: left;
+      }
+
+      td {
+        padding: 14px;
+        border-bottom: 1px solid #eee;
+      }
+
+      tr:hover {
+        background: #f1f5f9;
+      }
+
+      /* DELETE BUTTON */
+
+      .delete-btn {
+        background: #ef4444;
+        border: none;
+        color: white;
+        padding: 6px 14px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .delete-btn:hover {
+        background: #dc2626;
+      }
+
+      /* RESPONSIVE */
+
+      @media (max-width: 900px) {
+        .sidebar {
+          width: 200px;
+        }
+
+        .main {
+          margin-left: 200px;
+        }
+      }
+
+      @media (max-width: 700px) {
+        .sidebar {
+          display: none;
+        }
+
+        .main {
+          margin-left: 0;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- SIDEBAR -->
+
+    <div class="sidebar">
+      <h2>TTMS Admin</h2>
+
+      <a href="{% url 'admindash' %}"><i class="fa fa-home"></i> Dashboard</a>
+
+      <a href="{% url 'addInstructors' %}"
+        ><i class="fa fa-user"></i> Teachers</a
+      >
+
+      <a href="{% url 'addRooms' %}"><i class="fa fa-door-open"></i> Rooms</a>
+
+      <a href="{% url 'addTimings' %}"><i class="fa fa-clock"></i> Timings</a>
+
+      <a href="{% url 'addCourses' %}"><i class="fa fa-book"></i> Courses</a>
+
+      <a href="{% url 'addDepts' %}"
+        ><i class="fa fa-building"></i> Departments</a
+      >
+
+      <a href="{% url 'addSections' %}"
+        ><i class="fa fa-layer-group"></i> Sections</a
+      >
+
+      <a href="{% url 'generate' %}"
+        ><i class="fa fa-calendar"></i> Generate Timetable</a
+      >
+
+      <a href="{% url 'logout' %}"><i class="fa fa-sign-out-alt"></i> Logout</a>
+    </div>
+
+    <!-- MAIN CONTENT -->
+
+    <div class="main">
+      <!-- TOPBAR -->
+
+      <div class="topbar">
+        <h3>Department Management</h3>
+
+        <div class="user">Welcome, {{ user.first_name }}</div>
+      </div>
+
+      <div class="content">
+        <div class="card">
+          <a href="{% url 'addDepts'%}" class="back-btn">
+            ← Back to Add Departments
+          </a>
+
+          <h2>Departments List</h2>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Department Name</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for dept in departments %}
+
+              <tr>
+                <td>{{dept.dept_name}}</td>
+
+                <td>
+                  <form
+                    action="{% url 'deletedepartment' dept.id %}"
+                    method="post"
+                  >
+                    {% csrf_token %}
+
+                    <button class="delete-btn">Delete</button>
+                  </form>
+                </td>
+              </tr>
+
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TimeTable Management System | Dashboard</title>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="https://use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+    <link
+      rel="canonical"
+      href="https://getbootstrap.com/docs/4.5/examples/carousel/"
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+      }
+
+      body {
+        background: #eef2f7;
+        color: #333;
+        padding-top: 80px;
+      }
+
+      /* NAVBAR */
+      nav.navbar {
+        background: linear-gradient(135deg, #0f172a, #1e3a8a);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        padding: 12px 40px;
+      }
+
+      .navbar-brand {
+        font-size: 20px;
+        font-weight: 600;
+        color: #fff !important;
+      }
+
+      .nav-link {
+        color: #fff !important;
+        margin-left: 15px;
+        font-weight: 500;
+        transition: 0.3s;
+      }
+
+      .nav-link:hover {
+        color: #38bdf8 !important;
+        transform: scale(1.05);
+      }
+
+      .dropdown-menu {
+        border-radius: 10px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      /* FIELDSET CARD */
+      .fieldset {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 40px;
+        background: #fff;
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        transition: 0.3s;
+      }
+
+      .fieldset:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+      }
+
+      .fieldset h1 {
+        color: #0f172a;
+        font-size: 28px;
+        margin-bottom: 25px;
+      }
+
+      /* BACK BUTTON */
+      .back-btn {
+        display: inline-block;
+        margin-bottom: 20px;
+        background: #0f172a;
+        color: #fff;
+        padding: 10px 25px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: 0.3s;
+      }
+
+      .back-btn:hover {
+        background: #020617;
+      }
+
+      /* TABLE */
+      .table1 {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+      }
+
+      .table1 th,
+      .table1 td {
+        padding: 12px;
+        text-align: center;
+        font-weight: 500;
+      }
+
+      .table1 th {
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        color: #fff;
+        font-weight: 600;
+      }
+
+      .table1 td {
+        border-bottom: 1px solid #e2e8f0;
+      }
+
+      .table1 tr:hover {
+        background: rgba(37, 99, 235, 0.1);
+        transition: 0.3s;
+      }
+
+      /* DELETE BUTTON */
+      .cross {
+        background: #ef4444;
+        color: #fff;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        transition: 0.3s;
+      }
+
+      .cross:hover {
+        background: #dc2626;
+      }
+
+      /* FORM INPUTS */
+      fieldset input,
+      fieldset select {
+        width: 100%;
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+        background: #f8fafc;
+        margin-top: 8px;
+        transition: 0.3s;
+      }
+
+      fieldset input:focus,
+      fieldset select:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+        background: #fff;
+      }
+
+      /* BUTTONS */
+      .submit {
+        display: inline-block;
+        margin-top: 20px;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        color: white;
+        padding: 12px 25px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-size: 15px;
+        transition: 0.3s;
+      }
+
+      .submit:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      a .submit {
+        background: #0f172a;
+      }
+
+      a .submit:hover {
+        background: #020617;
+      }
+
+      /* RESPONSIVE */
+      @media (max-width: 768px) {
+        .fieldset {
+          width: 90%;
+          padding: 25px;
+        }
+
+        .table1 th,
+        .table1 td {
+          padding: 8px;
+          font-size: 0.9rem;
+        }
+
+        .back-btn {
+          padding: 8px 20px;
+          font-size: 0.9rem;
+        }
+      }
+    </style>
+
+    <link rel="stylesheet" type="text/css" href="static/css/index.css" />
+  </head>
+  <body>
+    <header>
+      <!--Navigation Bar-->
+      <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+        <a class="navbar-brand" href="#"><b>TimeTable Management System</b></a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-toggle="collapse"
+          data-target="#navbarCollapse"
+          aria-controls="navbarCollapse"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'admindash' %}">Get Started</a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'addInstructors' %}"
+                >Add Teachers</a
+              >
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="{% url 'addRooms' %}">Add Rooms</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'addTimings' %}">Add Timings</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'addCourses' %}">Add Courses</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'addDepts' %}"
+                >Add Departments</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'addSections' %}"
+                >Add Sections</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'generate' %}"
+                >Generate Timetable</a
+              >
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link">|</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="dropdown03"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+                >Welcome, {{ user.first_name }}</a
+              >
+              <div class="dropdown-menu" aria-labelledby="dropdown03">
+                <a class="dropdown-item" href="{% url 'password_change' %}"
+                  >Change Password</a
+                >
+                <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+              </div>
+            </li>
+          </ul>
+
+          <script type="text/javascript">
+            var checkList = document.getElementById("list1");
+            var items = document.getElementById("items");
+            checkList.getElementsByClassName("anchor")[0].onclick = function (
+              evt,
+            ) {
+              if (items.classList.contains("visible")) {
+                items.classList.remove("visible");
+                items.style.display = "none";
+              } else {
+                items.classList.add("visible");
+                items.style.display = "block";
+              }
+            };
+
+            items.onblur = function (evt) {
+              items.classList.remove("visible");
+            };
+          </script>
+        </div>
+      </nav>
+    </header>
+    {% block content %} {% load static %}
+    <br />
+    <br />
+
+    <fieldset class="fieldset">
+      <a href="{% url 'addRooms'%}"
+        ><h1 class="tablink" onclick="openPage('new')" id="defaultOpen">
+          Back to Add Rooms
+        </h1></a
+      >
+      <div class="tabcontent" id="edit">
+        <table class="table1">
+          <thead>
+            <tr class="table-headers">
+              <th>Room No.</th>
+              <th>Seating Capacity</th>
+              <th class="empty"></th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for rm in rooms %}
+            <tr>
+              <td>{{rm.r_number}}</td>
+              <td>{{rm.seating_capacity}}</td>
+              <td class="empty">
+                <form action="{% url 'deleteroom' rm.id %}" method="post">
+                  {% csrf_token %}
+                  <input type="submit" value="Delete" class="cross" />
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </fieldset>
+
+    {% endblock %}
+  </body>
+</html>
