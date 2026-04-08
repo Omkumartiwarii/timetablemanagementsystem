@@ -1,0 +1,186 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Timetable | Timetable System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="{% static 'js/script.js' %}"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: #f4f6f9;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: #2c3e50;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .navbar h2 {
+            font-weight: 500;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+        }
+
+        /* Container */
+        .container {
+            padding: 30px;
+        }
+
+        h3 {
+            margin-bottom: 20px;
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            text-align: center;
+            padding: 12px;
+            font-size: 14px;
+        }
+
+        th {
+            background: #3498db;
+            color: white;
+        }
+
+        td {
+            height: 80px;
+        }
+
+        .cell {
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .subject {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .faculty {
+            color: #555;
+        }
+
+        .room {
+            color: #888;
+            font-size: 12px;
+        }
+
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+    <h2>Timetable</h2>
+    <div>
+        <a href="{% url 'student_dashboard' %}">Dashboard</a>
+        <a href="{% url 'logout' %}">Logout</a>
+    </div>
+</div>
+
+<!-- CONTENT -->
+<div class="container">
+    <h3>Weekly Timetable</h3>
+    <form method="get" style="margin-bottom: 20px; text-align: center;">
+
+    <label><b>Department:</b></label>
+    <select name="department" style="padding: 5px; margin-right: 10px;">
+        <option value="">All</option>
+        {% for dept in departments %}
+            <option value="{{ dept.id }}"
+                {% if dept.id|stringformat:"s" == selected_department %}selected{% endif %}>
+                {{ dept.name }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <label><b>Semester:</b></label>
+    <select name="semester" style="padding: 5px; margin-right: 10px;">
+        <option value="">All</option>
+        {% for sem in semesters %}
+            <option value="{{ sem.id }}"
+                {% if sem.id|stringformat:"s" == selected_semester %}selected{% endif %}>
+                Semester {{ sem.semester_number }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <button type="submit" style="
+        padding: 6px 12px;
+        background: #3498db;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;">
+        Filter
+    </button>
+
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Time / Day</th>
+                {% for day in days %}
+                    <th>{{ day }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for slot in slots %}
+            <tr>
+                <td>{{ slot.start_time }} - {{ slot.end_time }}</td>
+
+                {% for day in days %}
+                    <td>
+                        {% for entry in timetable %}
+                            {% if entry.timeslot.day == day and entry.timeslot.start_time == slot.start_time %}
+                                <div class="cell">
+                                    <div class="subject">{{ entry.subject.name }}</div>
+                                    <div class="faculty">{{ entry.faculty.name }}</div>
+                                    <div class="room">Room: {{ entry.classroom.room_number }}</div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+
+</body>
+</html>
