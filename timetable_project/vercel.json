@@ -2,15 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "timetable_project/wsgi.py",
-      "use": "@vercel/python",
-      "config": { "maxLambdaSize": "15mb", "runtime": "python3.11.9" }
+      "src": "api/index.py",
+      "use": "@vercel/python"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "timetable_project/wsgi.py"
+      "dest": "api/index.py"
     }
   ]
 }
