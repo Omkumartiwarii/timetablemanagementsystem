@@ -8,7 +8,7 @@ from .forms import *   # ✅ FIXED (top pe)
 from .algorithms import generate_timetable
 import io
 
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+
 from reportlab.lib import colors
 
 
