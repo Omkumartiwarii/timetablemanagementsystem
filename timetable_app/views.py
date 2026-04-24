@@ -30,7 +30,7 @@ def login_view(request):
 
             if user and user.is_staff:
                 login(request, user)
-                return redirect('generate')
+                return redirect('admin_dashboard')
             else:
                 messages.error(request, "Invalid Admin Credentials")
 
@@ -59,6 +59,22 @@ def logout_view(request):
     logout(request)
     return redirect('login')
 
+# =========================
+# ADMIN DASHBOARD
+# =========================
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def admin_dashboard(request):
+    if not request.user.is_staff:
+        return redirect('student_dashboard')
+
+    return render(request, 'admin_dashboard.html', {
+        'departments': Department.objects.all(),
+        'semesters': Semester.objects.all(),
+        'faculties': Faculty.objects.all(),
+        'subjects': Subject.objects.all(),
+    })
 
 # =========================
 # GENERATE TIMETABLE
@@ -72,22 +88,13 @@ def generate_view(request):
     if not request.user.is_staff:
         return redirect('student_dashboard')
 
-    semesters = Semester.objects.all()
-    departments = Department.objects.all()
-
-    auto = request.GET.get('auto')
-
     def generate_for_semesters(sem_list):
         for sem in sem_list:
-            print(f"Generating for: {sem}")
-
             Timetable.objects.filter(semester=sem).delete()
 
             schedule = generate_timetable(sem)
-            print("Schedule:", schedule)
 
             if not schedule:
-                print("No schedule generated!")
                 continue
 
             for entry in schedule:
@@ -97,18 +104,18 @@ def generate_view(request):
                         subject=entry.get('subject'),
                         faculty=entry.get('faculty'),
                         classroom=entry.get('classroom'),
-                        timeslot=entry.get('slot')  # change if needed
+                        timeslot=entry.get('slot')
                     )
                 except Exception as e:
                     print("Save Error:", e)
 
-    # AUTO GENERATE
-    if auto:
+    # ================= AUTO GENERATE =================
+    if request.GET.get('auto'):
         generate_for_semesters(Semester.objects.all())
-        messages.success(request, "Timetable Generated Successfully ✅")
-        return redirect('timetable')
+        messages.success(request, "All Timetables Generated ✅")
+        return redirect('admin_dashboard')   # ✅ FIXED
 
-    # POST LOGIC
+    # ================= MANUAL GENERATE =================
     if request.method == 'POST':
         semester_id = request.POST.get('semester')
         department_id = request.POST.get('department')
@@ -120,23 +127,22 @@ def generate_view(request):
                 sems = Semester.objects.all()
 
             generate_for_semesters(sems)
-            return redirect('timetable')
+            messages.success(request, "Department Timetable Generated ✅")
+            return redirect('admin_dashboard')   # ✅ FIXED
 
         if department_id == "all":
             generate_for_semesters(Semester.objects.all())
-            return redirect('timetable')
+            messages.success(request, "All Timetables Generated ✅")
+            return redirect('admin_dashboard')   # ✅ FIXED
 
         semester = get_object_or_404(Semester, id=semester_id)
         generate_for_semesters([semester])
 
-        return redirect(f'/timetable/?semester={semester.id}')
+        messages.success(request, "Semester Timetable Generated ✅")
+        return redirect('admin_dashboard')   # ✅ FIXED
 
-    return render(request, 'admin_dashboard.html', {
-        'semesters': semesters,
-        'departments': departments,
-        'faculties': Faculty.objects.all(),
-        'subjects': Subject.objects.all(),
-    })
+    # ❌ direct access allowed nahi
+    return redirect('admin_dashboard')
 
 # =========================
 # VIEW TIMETABLE
@@ -316,34 +322,41 @@ def student_dashboard(request):
 # =========================
 
 #Add & View Department
-@login_required
+from django.shortcuts import render, redirect
+from .models import Department, Semester, Faculty, Subject
+
 def add_department(request):
-    show_list = False
+    # ✅ Count ke liye data bhejo
+    departments = Department.objects.all()
+    semesters = Semester.objects.all()
+    faculties = Faculty.objects.all()
+    subjects = Subject.objects.all()
 
-    # ✅ View button (GET)
-    if request.GET.get("view_list") == "true":
-        show_list = True
+    dept_list = None
 
-    # ✅ Save department
-    if request.method == 'POST':
-        name = request.POST.get('name')
-
+    # Save Department
+    if request.method == "POST":
+        name = request.POST.get("name")
         if name:
             Department.objects.create(name=name)
             return redirect('add_department')
 
-    return render(request, 'add_department.html', {
-        # ✅ counts (fast + safe)
-        'departments': Department.objects.count(),
-        'semesters': Semester.objects.count(),
-        'faculties': Faculty.objects.count(),
-        'subjects': Subject.objects.count(),
+    # View List Button
+    if request.GET.get("view_list") == "true":
+        dept_list = Department.objects.all()
 
-        # ✅ list show
-        'dept_list': Department.objects.all() if show_list else None,
-    })
+    context = {
+        "departments": departments,
+        "semesters": semesters,
+        "faculties": faculties,
+        "subjects": subjects,
+        "dept_list": dept_list,
+    }
 
+    return render(request, "add_department.html", context)
 
+#Add & View Semester
+from django.shortcuts import render, redirect
 @login_required
 def add_semester(request):
     form = SemesterForm(request.POST or None)
@@ -468,27 +481,28 @@ from django.contrib.auth.decorators import login_required
 from .models import TimeSlot, Department, Semester, Faculty, Subject
 from .forms import TimeSlotForm
 
+
 @login_required
 def add_timeslot(request):
     form = TimeSlotForm(request.POST or None)
-
     show_list = False
 
-    # ✅ GET request se list show
+    # 🔹 SHOW LIST (GET)
     if request.GET.get("view_list") == "true":
         show_list = True
 
-    # ✅ SAVE
+    # 🔹 SAVE (POST)
     if request.method == "POST":
         if form.is_valid():
             form.save()
             return redirect('add_timeslot')
 
-    return render(request, 'add_timeslot.html', {
+    # 🔹 CONTEXT (Clean + Consistent)
+    context = {
         'form': form,
         'title': 'Add Time Slot',
 
-        # ✅ stats
+        # ✅ stats (numbers, so NO |length in template)
         'departments': Department.objects.count(),
         'semesters': Semester.objects.count(),
         'faculties': Faculty.objects.count(),
@@ -496,7 +510,10 @@ def add_timeslot(request):
 
         # ✅ list
         'timeslots': TimeSlot.objects.all() if show_list else None,
-    })
+        'show_list': show_list,  # optional (UI control ke liye useful)
+    }
+
+    return render(request, 'add_timeslot.html', context)
 
 # Add Faculty
 # def add_faculty(request):

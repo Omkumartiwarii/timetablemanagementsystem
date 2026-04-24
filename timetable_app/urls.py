@@ -13,7 +13,8 @@ urlpatterns = [
     # DASHBOARD
     # =========================
     path('generate/', views.generate_view, name='generate'),
-    path('student/', views.student_dashboard, name='student_dashboard'),
+    path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    path('student-dashboard/', views.student_dashboard, name='student_dashboard'),
 
     # =========================
     # TIMETABLE

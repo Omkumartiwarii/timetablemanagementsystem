@@ -1,9 +1,11 @@
 {% load static %}
+
 <!doctype html>
+
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Add Classroom</title>
+    <title>Add Classroom | TTGS</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <link
@@ -28,19 +30,57 @@
       /* SIDEBAR */
       .sidebar {
         width: 260px;
-        background: rgba(0, 0, 0, 0.35);
+        background: rgba(0, 0, 0, 0.3);
         backdrop-filter: blur(12px);
         color: white;
         padding: 20px;
         position: fixed;
-        height: 100%;
+        height: 100vh;
+        left: 0;
+        top: 0;
+        z-index: 1000;
+        transition: all 0.3s ease;
+
+        display: flex; /* ✅ IMPORTANT */
+        flex-direction: column; /* ✅ IMPORTANT */
+        overflow: hidden; /* ❌ no full scroll */
       }
 
-      .sidebar h2 {
-        text-align: center;
-        margin-bottom: 30px;
+      /* LOGO */
+      .logo-box {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 20px;
       }
 
+      .logo-box img {
+        width: 50px;
+        height: 50px;
+      }
+
+      .logo-box h2 {
+        font-size: 18px;
+        font-weight: 600;
+      }
+
+      /* MENU (SCROLLABLE) */
+      .menu {
+        flex: 1;
+        overflow-y: auto;
+        padding-right: 5px;
+      }
+
+      .menu::-webkit-scrollbar {
+        width: 6px;
+      }
+      .menu::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 10px;
+      }
+
+      /* MENU LINKS */
       .menu a {
         display: block;
         padding: 12px 15px;
@@ -52,8 +92,52 @@
       }
 
       .menu a:hover {
-        background: rgba(255, 255, 255, 0.2);
+        background: linear-gradient(
+          135deg,
+          rgba(15, 23, 42, 0.6),
+          rgba(39, 77, 83, 0.6),
+          rgba(92, 104, 120, 0.6),
+          rgba(49, 58, 79, 0.6)
+        );
         padding-left: 20px;
+      }
+
+      /* 🔥 BOTTOM LINKS (FIXED) */
+      .bottom-links {
+        margin-top: auto;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        padding-top: 10px;
+      }
+
+      .bottom-links a {
+        display: block;
+        padding: 12px 15px;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+      }
+
+      .bottom-links a:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      /* OVERLAY */
+      .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        opacity: 0;
+        visibility: hidden;
+        transition: 0.3s;
+        z-index: 900;
+      }
+
+      .overlay.active {
+        opacity: 1;
+        visibility: visible;
       }
 
       /* MAIN */
@@ -65,15 +149,38 @@
       /* TOPBAR */
       .topbar {
         display: flex;
-        justify-content: flex-end;
-        padding: 15px 30px;
+        align-items: center;
+        padding: 15px 20px;
         background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        color: white;
+      }
+
+      .topbar-left h2 {
+        font-size: 18px;
+      }
+
+      .topbar-right {
+        margin-left: auto;
+        display: flex;
+        gap: 20px;
       }
 
       .topbar a {
         color: white;
-        margin-left: 20px;
         text-decoration: none;
+        font-weight: 500;
+      }
+
+      /* TOGGLE */
+      .menu-toggle {
+        display: none;
+        position: fixed;
+        right: 15px;
+        z-index: 2000;
+        font-size: 28px;
+        color: white;
+        cursor: pointer;
       }
 
       /* CONTENT */
@@ -90,107 +197,121 @@
       }
 
       .card-box {
-        background: rgba(255, 255, 255, 0.25);
+        background: rgba(255, 255, 255, 0.2);
         backdrop-filter: blur(10px);
         color: white;
         padding: 20px;
         border-radius: 12px;
         text-align: center;
-        transition: 0.3s;
       }
 
-      .card-box:hover {
-        transform: translateY(-5px);
-      }
-
-      /* FORM CARD */
+      /* CARD */
       .card {
         background: white;
         padding: 30px;
         border-radius: 12px;
         max-width: 500px;
         margin: auto;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
       }
 
-      .card h3 {
-        margin-bottom: 20px;
-        text-align: center;
-      }
-
-      input {
+      input,
+      button {
         width: 100%;
         padding: 12px;
-        margin-top: 10px;
-        border-radius: 8px;
+        margin-top: 15px;
+        border-radius: 6px;
         border: 1px solid #ccc;
-        transition: 0.3s;
-      }
-
-      input:focus {
-        border-color: #667eea;
-        outline: none;
-        box-shadow: 0 0 5px rgba(102, 126, 234, 0.4);
       }
 
       .btn {
-        margin-top: 20px;
-        width: 100%;
-        padding: 12px;
         background: #667eea;
         color: white;
         border: none;
-        border-radius: 6px;
         cursor: pointer;
-        transition: 0.3s;
       }
 
-      .btn:hover {
-        background: #5a67d8;
-        transform: scale(1.02);
-      }
+      /* MOBILE */
+      @media (max-width: 768px) {
+        .sidebar {
+          left: -260px;
+        }
 
-      .back {
-        text-align: center;
-        margin-top: 15px;
-      }
+        .sidebar.active {
+          left: 0;
+        }
 
-      .back a {
-        text-decoration: none;
-        color: #555;
+        .main {
+          margin-left: 0;
+        }
+
+        .menu-toggle {
+          display: block;
+        }
+
+        .content {
+          padding: 20px;
+        }
+
+        .logo-box {
+          justify-content: flex-start;
+        }
+
+        .topbar-right {
+          display: none;
+        }
+      }
+      /* DESKTOP par hide */
+      @media (min-width: 769px) {
+        .bottom-links {
+          display: none;
+        }
       }
     </style>
   </head>
 
   <body>
-    <!-- SIDEBAR -->
     <div class="sidebar">
-      <h2>TTGS Admin</h2>
+      <div class="logo-box">
+        <img src="{% static 'images/logo.png' %}" alt="Logo" />
+        <h2>TTGS Admin</h2>
+      </div>
 
       <div class="menu">
-        <a href="{% url 'add_faculty' %}">Add Teachers</a>
-        <a href="{% url 'add_timeslot' %}">Add Timing</a>
-        <a href="{% url 'add_subject' %}">Add Subjects</a>
-        <a href="{% url 'add_department' %}">Add Departments</a>
+        <a href="{% url 'add_faculty' %}">Teachers</a>
+        <a href="{% url 'add_timeslot' %}">Timing</a>
+        <a href="{% url 'add_subject' %}">Subjects</a>
+        <a href="{% url 'add_department' %}">Departments</a>
         <a href="{% url 'add_subject_faculty' %}">Assign Subject</a>
-        <a href="{% url 'add_classroom' %}">Add Classrooms</a>
-        <a href="{% url 'add_semester' %}">Add Semesters</a>
+        <a href="{% url 'add_classroom' %}">Classrooms</a>
+        <a href="{% url 'add_semester' %}">Semesters</a>
         <a href="{% url 'generate' %}?auto=true">Generate Time Table</a>
         <a href="{% url 'timetable' %}">View Timetable</a>
       </div>
+
+      <div class="bottom-links">
+        <hr style="margin: 15px 0; border-color: rgba(255, 255, 255, 0.2)" />
+        <a href="{% url 'student_dashboard' %}">🏠︎ Home</a>
+        <a href="{% url 'logout' %}">⏻ Logout</a>
+      </div>
     </div>
 
-    <!-- MAIN -->
+    <div class="overlay" id="overlay"></div>
+
     <div class="main">
-      <!-- TOPBAR -->
       <div class="topbar">
-        <a href="{% url 'student_dashboard' %}">Home</a>
-        <a href="{% url 'logout' %}">Logout</a>
+        <div class="topbar-left">
+          <h2>TTGS Admin</h2>
+        </div>
+
+        <div class="topbar-right">
+          <a href="{% url 'student_dashboard' %}">Home</a>
+          <a href="{% url 'logout' %}">Logout</a>
+        </div>
+
+        <span class="menu-toggle" id="menuBtn" onclick="toggleMenu()">☰</span>
       </div>
 
-      <!-- CONTENT -->
       <div class="content">
-        <!-- STATS -->
         <div class="stats">
           <div class="card-box">
             <h4>Departments</h4>
@@ -213,7 +334,6 @@
           </div>
         </div>
 
-        <!-- FORM -->
         <div class="card">
           <h3>🏫 Add Classroom</h3>
 
@@ -222,12 +342,27 @@
 
             <button type="submit" class="btn">Save Classroom</button>
           </form>
-
-          <div class="back">
-            <a href="{% url 'generate' %}">← Back to Dashboard</a>
-          </div>
         </div>
       </div>
     </div>
+
+    <script>
+      function toggleMenu() {
+        const sidebar = document.querySelector(".sidebar");
+        const btn = document.getElementById("menuBtn");
+        const overlay = document.getElementById("overlay");
+
+        const isOpen = sidebar.classList.toggle("active");
+        overlay.classList.toggle("active");
+
+        btn.textContent = isOpen ? "✖" : "☰";
+      }
+
+      document.getElementById("overlay").addEventListener("click", function () {
+        document.querySelector(".sidebar").classList.remove("active");
+        this.classList.remove("active");
+        document.getElementById("menuBtn").textContent = "☰";
+      });
+    </script>
   </body>
 </html>

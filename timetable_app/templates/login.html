@@ -20,24 +20,58 @@
       }
 
       body {
-        height: 100vh;
-        background: linear-gradient(135deg, #2c3e50, #3498db);
+        min-height: 100vh;
+        background: linear-gradient(135deg, #141e30, #243b55);
         display: flex;
         justify-content: center;
         align-items: center;
+        padding: 20px;
       }
 
-      .login-container {
-        width: 350px;
-        background: #fff;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      /* 🔷 Wrapper */
+      .wrapper {
+        width: 100%;
+        max-width: 420px;
         text-align: center;
+        color: white;
       }
 
+      /* 🔷 Logo */
+      .logo {
+        height: 130px;
+        width: 200px;
+        margin-bottom: 10px;
+      }
+
+      /* 🔷 Title */
+      .main-title {
+        font-size: 26px;
+        font-weight: 600;
+      }
+
+      .subtitle {
+        font-size: 13px;
+        color: #cbd5e1;
+        margin-bottom: 25px;
+      }
+
+      /* 🔥 Glass Card */
+      .login-container {
+        width: 100%;
+        padding: 30px;
+        border-radius: 16px;
+        backdrop-filter: blur(15px);
+        background: rgba(255, 255, 255, 0.1);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        animation: fadeIn 0.8s ease;
+      }
+
+      /* Toggle Buttons */
       .toggle-btns {
         display: flex;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        overflow: hidden;
         margin-bottom: 20px;
       }
 
@@ -46,105 +80,169 @@
         padding: 10px;
         border: none;
         cursor: pointer;
-        background: #ddd;
+        background: transparent;
+        color: white;
+        transition: 0.3s;
       }
 
       .toggle-btns button.active {
-        background: #3498db;
-        color: white;
+        background: #00c6ff;
+        color: black;
+        font-weight: 500;
       }
 
+      /* Heading */
+      .login-container h3 {
+        margin-bottom: 18px;
+        font-weight: 500;
+      }
+
+      /* Inputs */
       .input-group {
-        margin-bottom: 15px;
+        margin-bottom: 14px;
         text-align: left;
       }
 
       .input-group input {
         width: 100%;
-        padding: 10px;
-        margin-top: 5px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
+        padding: 12px;
+        border-radius: 8px;
+        border: none;
+        outline: none;
+        background: rgba(255, 255, 255, 0.15);
+        color: white;
+        font-size: 14px;
       }
 
+      .input-group input::placeholder {
+        color: #ddd;
+      }
+
+      .input-group input:focus {
+        background: rgba(255, 255, 255, 0.25);
+        box-shadow: 0 0 6px #00c6ff;
+      }
+
+      /* Button */
       .btn {
         width: 100%;
-        padding: 10px;
-        background: #3498db;
+        padding: 12px;
+        border-radius: 8px;
         border: none;
-        color: #fff;
-        border-radius: 5px;
+        background: linear-gradient(135deg, #00c6ff, #0072ff);
+        color: white;
+        font-weight: 500;
         cursor: pointer;
+        transition: 0.3s;
       }
 
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0 12px #00c6ff;
+      }
+
+      /* Error */
       .error {
-        color: red;
+        color: #ff6b6b;
         font-size: 13px;
         margin-bottom: 10px;
+      }
+
+      /* Animation */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(25px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* 📱 Responsive */
+      @media (max-width: 480px) {
+        .main-title {
+          font-size: 22px;
+        }
+
+        .login-container {
+          padding: 25px;
+        }
       }
     </style>
   </head>
 
   <body>
-    <div class="login-container">
-      <!-- Toggle Buttons -->
-      <div class="toggle-btns">
-        <button id="adminBtn" class="active" onclick="showAdmin()">
-          Admin
-        </button>
-        <button id="studentBtn" onclick="showStudent()">Student</button>
+    <div class="wrapper">
+      <!-- 🔷 LOGO -->
+      <img src="{% static 'images/logo.png' %}" alt="Logo" class="logo" />
+
+      <!-- 🔷 HEADER -->
+      <div class="main-title">Timetable Generation System</div>
+      <div class="subtitle">
+        Smart & automated platform for managing academic schedules efficiently
       </div>
 
-      <!-- Error -->
-      {% if messages %} {% for message in messages %}
-      <div class="error">{{ message }}</div>
-      {% endfor %} {% endif %}
-
-      <!-- ================= ADMIN FORM ================= -->
-      <form method="POST" id="adminForm">
-        {% csrf_token %}
-        <h3>Admin Login</h3>
-
-        <div class="input-group">
-          <input
-            type="text"
-            name="username"
-            placeholder="Admin Username"
-            required
-          />
+      <!-- 🔥 LOGIN CARD -->
+      <div class="login-container">
+        <div class="toggle-btns">
+          <button id="adminBtn" class="active" onclick="showAdmin()">
+            Admin
+          </button>
+          <button id="studentBtn" onclick="showStudent()">Student</button>
         </div>
 
-        <div class="input-group">
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            required
-          />
-        </div>
+        {% if messages %} {% for message in messages %}
+        <div class="error">{{ message }}</div>
+        {% endfor %} {% endif %}
 
-        <button type="submit" name="role" value="admin" class="btn">
-          Login
-        </button>
-      </form>
+        <!-- ADMIN -->
+        <form method="POST" id="adminForm">
+          {% csrf_token %}
+          <h3>Admin Login</h3>
 
-      <!-- ================= STUDENT FORM ================= -->
-      <form method="POST" id="studentForm" style="display: none">
-        {% csrf_token %}
-        <h3>Student Access</h3>
+          <div class="input-group">
+            <input
+              type="text"
+              name="username"
+              placeholder="Username"
+              required
+            />
+          </div>
 
-        <div class="input-group">
-          <input
-            type="text"
-            name="enrollment"
-            placeholder="Enrollment (optional)"
-          />
-        </div>
+          <div class="input-group">
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              required
+            />
+          </div>
 
-        <button type="submit" name="role" value="student" class="btn">
-          Enter
-        </button>
-      </form>
+          <button type="submit" name="role" value="admin" class="btn">
+            Login as Admin
+          </button>
+        </form>
+
+        <!-- STUDENT -->
+        <form method="POST" id="studentForm" style="display: none">
+          {% csrf_token %}
+          <h3>Student Access</h3>
+
+          <div class="input-group">
+            <input
+              type="text"
+              name="enrollment"
+              placeholder="Enter Enrollment Number"
+            />
+          </div>
+
+          <button type="submit" name="role" value="student" class="btn">
+            Continue as Student
+          </button>
+        </form>
+      </div>
     </div>
 
     <script>
