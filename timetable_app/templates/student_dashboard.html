@@ -6,8 +6,6 @@
 <meta charset="UTF-8">
 <title>Student Dashboard</title>
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -20,162 +18,233 @@
     --text:#1f2937;
 }
 
-*{
+/* RESET */
+* {
     margin:0;
     padding:0;
     box-sizing:border-box;
-    font-family:'Poppins',sans-serif;
+    font-family:'Poppins', sans-serif;
 }
 
-body{
+body {
     background:var(--bg);
     padding:20px;
 }
 
-/* HEADER */
-.header{
+/* ================= HEADER ================= */
+.header {
     display:flex;
     justify-content:space-between;
     align-items:center;
-    padding:12px 20px;
-    margin-bottom:20px;
+    padding:15px 20px;
+    flex-wrap:wrap;
+    gap:10px;
 }
 
-.logo-box{
+/* LEFT */
+.logo-box {
     display:flex;
     align-items:center;
     gap:10px;
 }
 
-.logo-box img{
-    width: 130px;
-    height: 100px;
+.logo-box img {
+    width:130px;
+    height:100px;
+    object-fit:contain;
     border-radius: 50%;
 }
 
-.nav-actions{
+/* RIGHT */
+.actions {
     display:flex;
+    align-items:center;
     gap:10px;
-}
-
-button{
-    padding:8px 16px;
-    border:none;
-    border-radius:8px;
-    color:#fff;
-    cursor:pointer;
-}
-
-.download-btn{background:#16a34a;}
-.logout-btn{background:#ef4444;}
-
-button:hover{opacity:.9}
-
-/* FILTER */
-form{
-    display:flex;
-    gap:10px;
-    margin-bottom:20px;
     flex-wrap:wrap;
 }
 
-select, form button{
+/* ================= BUTTONS ================= */
+button {
+    padding:8px 14px;
+    border:none;
+    border-radius:8px;
+    background:var(--primary);
+    color:white;
+    cursor:pointer;
+    font-size:14px;
+    transition:0.2s;
+}
+
+button:hover {
+    opacity:0.9;
+    transform:translateY(-1px);
+}
+
+.download-btn {
+    background:#16a34a;
+}
+
+.logout-btn {
+    background:#ef4444;
+}
+
+/* ================= TEXT ================= */
+h2 {
+    color:var(--text);
+    font-size:20px;
+}
+
+h3 {
+    margin-bottom:15px;
+    color:var(--text);
+}
+
+/* ================= FILTER ================= */
+form {
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:20px;
+}
+
+select {
     padding:8px;
     border-radius:8px;
     border:1px solid #ccc;
+    background:white;
 }
 
-/* CARD */
-.page{
-    background:#fff;
-    padding:15px;
+/* ================= CARD ================= */
+.page {
+    background:var(--card);
+    padding:20px;
     border-radius:12px;
-    margin-bottom:20px;
     box-shadow:0 5px 20px rgba(0,0,0,0.08);
+    margin-bottom:25px;
+
+    /* 🔥 SCROLL FIX */
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    scroll-behavior: smooth;
 }
 
-h3{margin-bottom:10px}
-
-/* TABLE */
-table{
+/* ================= TABLE ================= */
+table {
     width:100%;
     border-collapse:collapse;
+
+    /* 🔥 IMPORTANT FOR MOBILE SCROLL */
+    min-width:700px;
 }
 
-th{
+th {
     background:var(--primary);
-    color:#fff;
-    padding:10px;
+    color:white;
+    padding:12px;
+    font-size:14px;
 }
 
-td{
+td {
     padding:10px;
     text-align:center;
     border-bottom:1px solid #eee;
+    font-size:13px;
 }
 
-.subject{font-weight:500}
-.faculty{font-size:12px;color:#666}
-.room{font-size:11px;color:#999}
-.empty{color:#bbb}
+tr:hover td {
+    background:#f1f5ff;
+}
 
-/* ================= MOBILE ================= */
-@media(max-width:768px){
+/* CELL TEXT */
+.subject {
+    font-weight:500;
+    color:#111;
+}
 
-    body{padding:10px;}
+.faculty {
+    font-size:12px;
+    color:#6b7280;
+}
 
-    .header{
+.room {
+    font-size:11px;
+    color:#9ca3af;
+}
+
+.empty {
+    color:#bbb;
+    font-size:12px;
+}
+
+/* ================= SCROLLBAR (OPTIONAL CLEAN) ================= */
+.page::-webkit-scrollbar {
+    height:6px;
+}
+
+.page::-webkit-scrollbar-thumb {
+    background:#ccc;
+    border-radius:10px;
+}
+
+/* ================= PDF SAFE ================= */
+#timetable {
+    background:white;
+    padding:10px;
+}
+
+.page {
+    page-break-inside: avoid;
+}
+
+.page + .page {
+    page-break-before: always;
+}
+
+/* ================= RESPONSIVE ================= */
+
+/* TABLET */
+@media (max-width: 992px) {
+    body {
+        padding:15px;
+    }
+
+    h2 {
+        font-size:18px;
+    }
+
+    button {
+        padding:7px 12px;
+        font-size:13px;
+    }
+}
+
+/* MOBILE */
+@media (max-width: 600px) {
+
+    body {
+        padding:10px;
+    }
+
+    .header {
         flex-direction:column;
         align-items:flex-start;
-        gap:10px;
     }
 
-    .nav-actions{
+    .actions {
         width:100%;
         justify-content:space-between;
     }
 
-    .nav-actions button{
-        width:48%;
+    .logo-box h2 {
+        font-size:16px;
     }
 
-    form{
-        flex-direction:column;
+    table {
+        font-size:12px;
     }
 
-    select, form button{
-        width:100%;
-    }
-
-    table, thead, tbody, th, td, tr{
-        display:block;
-        width:100%;
-    }
-
-    thead{display:none;}
-
-    tr{
-        background:#fff;
-        margin-bottom:15px;
-        border-radius:10px;
-        padding:10px;
-        box-shadow:0 3px 10px rgba(0,0,0,0.08);
-    }
-
-    td{
-        display:flex;
-        justify-content:space-between;
-        text-align:left;
-        border:none;
-        border-bottom:1px solid #eee;
-    }
-
-    td:last-child{border:none;}
-
-    td::before{
-        content:attr(data-label);
-        font-weight:600;
-        color:var(--primary);
+    th, td {
+        padding:8px;
     }
 }
 </style>
@@ -183,19 +252,23 @@ td{
 
 <body>
 
-<!-- HEADER -->
 <div class="header">
+
     <div class="logo-box">
-        <img src="{% static 'images/logo.png' %}">
+        <img src="{% static 'images/logo.png' %}" alt="Logo">
         <h2>TTGS Student Dashboard</h2>
     </div>
 
-    <div class="nav-actions">
-        <button onclick="downloadPDF()" class="download-btn">⬇ Download</button>
+    <div class="actions">
+        <button onclick="downloadPDF()" class="download-btn">
+            ⬇ Download PDF
+        </button>
+
         <a href="{% url 'logout' %}">
             <button class="logout-btn">Logout</button>
         </a>
     </div>
+
 </div>
 
 <!-- FILTER -->
@@ -223,10 +296,11 @@ td{
 <button type="submit">Apply</button>
 </form>
 
-<!-- TIMETABLE -->
+<!-- TIMETABLE WRAPPER (PDF TARGET) -->
 <div id="timetable">
 
 {% if grouped_data %}
+
 {% for title, timetable in grouped_data.items %}
 
 <div class="page">
@@ -234,65 +308,92 @@ td{
 
 <table>
 
-<thead>
 <tr>
     <th>Day</th>
+
     {% regroup slots by start_time as unique_slots %}
+
     {% for group in unique_slots %}
         <th>{{ group.grouper }} - {{ group.list.0.end_time }}</th>
     {% endfor %}
 </tr>
-</thead>
 
-<tbody>
 {% for day in days %}
 <tr>
+    <td><b>{{ day }}</b></td>
 
-<td data-label="Day"><b>{{ day }}</b></td>
+    {% for group in unique_slots %}
+        {% with time=group.grouper|time:"H:i" %}
+        {% with key=day|add:"_"|add:time %}
 
-{% for group in unique_slots %}
-{% with time=group.grouper|time:"H:i" %}
-{% with key=day|add:"_"|add:time %}
+        <td>
+        {% if timetable|get_item:key %}
+            {% with entry=timetable|get_item:key %}
+                <div class="subject">{{ entry.subject.name }}</div>
+                <div class="faculty">{{ entry.faculty.name }}</div>
+                <div class="room">Room {{ entry.classroom.room_number }}</div>
+            {% endwith %}
+        {% else %}
+            <div class="empty">Free</div>
+        {% endif %}
+        </td>
 
-<td data-label="{{ group.grouper }}">
-{% if timetable|get_item:key %}
-    {% with entry=timetable|get_item:key %}
-        <div class="subject">{{ entry.subject.name }}</div>
-        <div class="faculty">{{ entry.faculty.name }}</div>
-        <div class="room">Room {{ entry.classroom.room_number }}</div>
-    {% endwith %}
-{% else %}
-    <div class="empty">Free</div>
-{% endif %}
-</td>
-
-{% endwith %}
-{% endwith %}
-{% endfor %}
+        {% endwith %}
+        {% endwith %}
+    {% endfor %}
 
 </tr>
 {% endfor %}
-</tbody>
 
 </table>
 </div>
 
 {% endfor %}
+
 {% endif %}
 
 </div>
 
-<!-- PDF -->
+<!-- JS PDF -->
 <script>
-function downloadPDF(){
-    const element=document.getElementById("timetable");
+function downloadPDF() {
+    const element = document.getElementById("timetable");
 
-    html2pdf().set({
-        margin:5,
-        filename:"timetable.pdf",
-        html2canvas:{scale:3},
-        jsPDF:{unit:'mm',format:'a4',orientation:'landscape'}
-    }).from(element).save();
+    const semSelect = document.querySelector('select[name="semester"]');
+    const deptSelect = document.querySelector('select[name="department"]');
+
+    let semText = semSelect.options[semSelect.selectedIndex].text;
+    let deptText = deptSelect.options[deptSelect.selectedIndex].text;
+
+    semText = semText.replace(/\s+/g, '_');
+    deptText = deptText.replace(/\s+/g, '_');
+
+    let fileName = "timetable";
+
+    if (deptText !== "Department") {
+        fileName = deptText;
+    }
+
+    if (semText !== "Semester") {
+        fileName += "_" + semText;
+    }
+
+    fileName += ".pdf";
+
+    const opt = {
+        margin: 5,
+        filename: fileName,
+        image: { type: 'jpeg', quality: 1 },
+        html2canvas: { scale: 3 },
+        jsPDF: {
+            unit: 'mm',
+            format: 'a4',
+            orientation: 'landscape'
+        },
+        pagebreak: { mode: ['avoid-all', 'css'] }
+    };
+
+    html2pdf().set(opt).from(element).save();
 }
 </script>
 
