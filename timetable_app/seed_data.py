@@ -16,7 +16,6 @@ def seed_database():
     # =========================
     # DEPARTMENTS
     # =========================
-    ALL, _ = Department.objects.get_or_create(name="ALL")
     CSE, _ = Department.objects.get_or_create(name="Computer Science Eng")
     ECE, _ = Department.objects.get_or_create(name="Electronics Communication Eng")
     ME, _ = Department.objects.get_or_create(name="Mechanical Eng")
@@ -26,7 +25,7 @@ def seed_database():
     APS, _ = Department.objects.get_or_create(name="Applied Science")
 
     
-    departments = [ALL, CSE, ECE, ME, CE, CECA, EE, APS]
+    departments = [CSE, ECE, ME, CE, CECA, EE, APS]
 
     # =========================
     # SEMESTERS
