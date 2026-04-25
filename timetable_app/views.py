@@ -10,7 +10,7 @@ import io
 
 
 from reportlab.lib import colors
-
+from django.db.models import Subquery
 
 # =========================
 # LOGIN
@@ -154,8 +154,8 @@ from .models import Timetable, TimeSlot, Semester, Department
 
 @login_required
 def timetable_view(request):
-    semester_id = request.GET.get('semester')
-    department_id = request.GET.get('department')
+    semester_id = request.GET.get('semester')or 'all'
+    department_id = request.GET.get('department')or 'all'
 
     # ✅ optimized query
     data = Timetable.objects.select_related(
@@ -166,12 +166,52 @@ def timetable_view(request):
         'timeslot'
     )
 
-    # ✅ filters
-    if semester_id and semester_id != "all":
-        data = data.filter(semester_id=semester_id)
+    # =========================
+    # Prevent mismatch:
+    # If selected semester does not belong to selected department,
+    # ignore semester filter
+    # =========================
+    if (
+        department_id != "all"
+        and semester_id != "all"
+    ):
+        try:
+            sem = Semester.objects.get(id=semester_id)
 
-    if department_id and department_id != "all":
-        data = data.filter(semester__department_id=department_id)
+            if str(sem.department_id) != str(department_id):
+                semester_id = "all"
+
+        except Semester.DoesNotExist:
+            semester_id = "all"
+
+    # =========================
+    # Apply Department Filter
+    # =========================
+    if department_id != "all":
+        data = data.filter(
+            semester__department_id=int(department_id)
+        )
+
+        # Only show semesters of selected department
+        semesters = Semester.objects.filter(
+            department_id=int(department_id),
+            id__in=Timetable.objects.values('semester_id').distinct()
+        )
+
+    else:
+        semesters = Semester.objects.filter(
+            id__in=Timetable.objects.values('semester_id').distinct()
+        )
+
+    # =========================
+    # Apply Semester Filter
+    # =========================
+    if semester_id != "all":
+        data = data.filter(
+            semester_id=int(semester_id)
+        )
+
+    print("Filtered records:", data.count())  # debug optional
 
     # ✅ grouping + unique slot mapping
     grouped_data = {}
@@ -198,8 +238,10 @@ def timetable_view(request):
         'grouped_data': grouped_data,
         'days': days,
         'slots': slots,
-        'semesters': Semester.objects.all(),
         'departments': Department.objects.all(),
+        'semesters': semesters,
+        'faculties': Faculty.objects.all(),
+        'subjects': Subject.objects.all(),
         'selected_semester': semester_id or "all",
         'selected_department': department_id or "all"
     })
@@ -235,13 +277,40 @@ def student_dashboard(request):
         'subject', 'faculty', 'classroom', 'timeslot', 'semester__department'
     )
 
+    if (
+        selected_department != "all"
+        and selected_semester != "all"
+    ):
+        try:
+            sem = Semester.objects.get(id=selected_semester)
+
+            if str(sem.department_id) != str(selected_department):
+                selected_semester = "all"
+
+        except Semester.DoesNotExist:
+            selected_semester = "all"
+    # =========================
+    # Department-based semester dropdown
+    # Only show valid semesters
+    # =========================
+    if selected_department != "all":
+        semesters = Semester.objects.filter(
+            department_id=selected_department
+        )
+    else:
+        semesters = Semester.objects.select_related(
+            'department'
+        )
+
     # ✅ FILTERS
-    if selected_department and selected_department != "all":
+    # Department filter
+    if selected_department != "all":
         timetable_qs = timetable_qs.filter(
             semester__department_id=selected_department
         )
 
-    if selected_semester and selected_semester != "all":
+    # Semester filter
+    if selected_semester != "all":
         timetable_qs = timetable_qs.filter(
             semester_id=selected_semester
         )

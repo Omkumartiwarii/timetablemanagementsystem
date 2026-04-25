@@ -273,7 +273,11 @@ tr:hover td {
 
 <!-- FILTER -->
 <form method="GET">
-<select name="department">
+<select name="department"
+onchange="
+document.getElementsByName('semester')[0].value='all';
+this.form.submit();
+">
     <option value="all">Department</option>
     {% for dept in departments %}
     <option value="{{ dept.id }}"

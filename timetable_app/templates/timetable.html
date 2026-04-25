@@ -371,7 +371,11 @@ td:not(:first-child){
 
   <form method="GET">
     <label>Department</label>
-    <select name="department">
+    <select name="department"
+    onchange="
+    document.getElementsByName('semester')[0].value='all';
+    this.form.submit();
+">
       <option value="all">All Departments</option>
       {% for dept in departments %}
       <option value="{{ dept.id }}"
