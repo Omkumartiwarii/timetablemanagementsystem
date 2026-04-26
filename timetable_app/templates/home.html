@@ -1,0 +1,198 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TTGS - Premium Timetable Generator</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{% static 'css/home.css' %}" />
+  </head>
+
+  <body>
+    <!-- NAVBAR -->
+    <div class="navbar">
+      <!-- BRAND (LOGO + TEXT) -->
+      <div class="brand">
+        <img class="logo-img" src="{% static 'images/logo.png' %}" alt="Logo" />
+        <div class="logo">TTGS</div>
+      </div>
+
+      <!-- HAMBURGER -->
+      <div class="menu-toggle" id="menuToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+
+      <!-- NAV LINKS -->
+      <div class="nav-links" id="navLinks">
+        <a href="">Home</a>
+        <a href="#about">About</a>
+        <a href="#features">Features</a>
+        <a href="#contact">Contact</a>
+        <a href="{% url 'login' %}" class="login-btn">Login</a>
+      </div>
+    </div>
+
+    <div id="overlay" class="overlay"></div>
+
+    <!-- HERO -->
+    <div class="hero">
+      <div class="carousel">
+        <!-- SLIDE 1 -->
+        <div class="slide active">
+          <h1 class="typing" data-text="Smart Timetable Generator"></h1>
+          <p>
+            Automatically generate conflict-free class schedules with our
+            intelligent timetable system. Save hours of manual work and
+            eliminate errors.
+          </p>
+
+          <div class="hero-stats">
+            <span>⚡ Instant Generation</span>
+            <span>🎯 Zero Clash</span>
+            <span>📊 Smart Allocation</span>
+          </div>
+        </div>
+
+        <!-- SLIDE 2 -->
+        <div class="slide">
+          <h1 class="typing" data-text="Automated Scheduling System"></h1>
+          <p>
+            Easily manage faculty, subjects, classrooms, and time slots in one
+            place. Our system ensures balanced workload distribution and
+            optimized scheduling.
+          </p>
+
+          <div class="hero-stats">
+            <span>👨‍🏫 Faculty Management</span>
+            <span>🏫 Room Allocation</span>
+            <span>📅 Smart Time Slots</span>
+          </div>
+        </div>
+
+        <!-- SLIDE 3 -->
+        <div class="slide">
+          <h1 class="typing" data-text="Fast & Reliable Generator"></h1>
+          <p>
+            Generate complete weekly timetables in seconds with high accuracy.
+            Designed for colleges, schools, and institutions of all sizes.
+          </p>
+
+          <div class="hero-stats">
+            <span>🚀 High Speed</span>
+            <span>🔒 Reliable System</span>
+            <span>🌐 Scalable Solution</span>
+          </div>
+        </div>
+
+        <!-- ARROWS -->
+        <!-- <button class="prev" onclick="prevSlide()">❮</button>
+        <button class="next" onclick="nextSlide()">❯</button> -->
+
+        <!-- DOTS -->
+        <div class="dots">
+          <span class="dot active" onclick="currentSlide(0)"></span>
+          <span class="dot" onclick="currentSlide(1)"></span>
+          <span class="dot" onclick="currentSlide(2)"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABOUT -->
+    <section id="about" class="section">
+      <h2 class="fade-up">About TTGS</h2>
+
+      <p class="fade-up about-text">
+        TTGS (Timetable Generation System) is a smart solution designed to
+        automate the complex process of timetable creation for schools and
+        colleges. It intelligently assigns faculty, subjects, and time slots
+        while ensuring zero conflicts and maximum efficiency.
+      </p>
+
+      <div class="about-grid fade-up">
+        <div class="about-box">🎯 Smart Allocation</div>
+        <div class="about-box">⏱ Saves Time</div>
+        <div class="about-box">📊 Optimized Scheduling</div>
+      </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section id="features" class="section">
+      <h2 class="fade-up">Powerful Features</h2>
+
+      <div class="feature-grid">
+        <div class="glass-card fade-up">
+          <h3>⚡ Instant Generation</h3>
+          <p>
+            Generate complete timetables within seconds using optimized logic.
+          </p>
+        </div>
+
+        <div class="glass-card fade-up">
+          <h3>✅ Zero Collision</h3>
+          <p>No overlapping classes, faculty clashes, or scheduling errors.</p>
+        </div>
+
+        <div class="glass-card fade-up">
+          <h3>👨‍🏫 Faculty Management</h3>
+          <p>
+            Easily assign subjects and manage teacher schedules efficiently.
+          </p>
+        </div>
+
+        <div class="glass-card fade-up">
+          <h3>🏫 Room Allocation</h3>
+          <p>
+            Smart classroom allocation to avoid conflicts and maximize usage.
+          </p>
+        </div>
+
+        <div class="glass-card fade-up">
+          <h3>🔒 Secure System</h3>
+          <p>Your academic data is safe with role-based authentication.</p>
+        </div>
+
+        <div class="glass-card fade-up">
+          <h3>📈 Scalable</h3>
+          <p>Works for schools, colleges, and large institutions seamlessly.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="section contact-section">
+      <h2 class="fade-up">Get in Touch</h2>
+
+      <p class="fade-up contact-text">
+        Have questions or want to integrate TTGS in your institution? We'd love
+        to hear from you.
+      </p>
+
+      <div class="contact-box fade-up">
+        <p>📧 Email: <strong>support@ttgs.com</strong></p>
+        <p>📞 Phone: +91 98765 43210</p>
+        <p>📍 Location: India</p>
+      </div>
+
+      <a href="mailto:yourmail@example.com" class="message">Send Message</a>
+    </section>
+
+    <!-- FOOTER -->
+    <div class="footer">
+      <p>© 2026 TTGS | Smart Timetable Generator</p>
+
+      <div class="socials">
+        <i class="fa fa-instagram"></i>
+        <i class="fa fa-linkedin"></i>
+        <i class="fa fa-github"></i>
+      </div>
+    </div>
+    <script src="{% static 'js/home.js' %}"></script>
+  </body>
+</html>
