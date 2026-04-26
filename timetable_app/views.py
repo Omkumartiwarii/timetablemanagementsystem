@@ -15,12 +15,9 @@ from django.db.models import Subquery
 # =========================
 # LOGIN
 # =========================
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import User
-from django.shortcuts import render, redirect
-from django.contrib import messages
-
 def login_view(request):
+    from django.contrib.auth.models import User
+
     if request.method == 'POST':
         role = request.POST.get('role')
 
@@ -29,10 +26,6 @@ def login_view(request):
             username = request.POST.get('username')
             password = request.POST.get('password')
 
-            if not username or not password:
-                messages.error(request, "Please enter username and password")
-                return redirect('/')
-
             user = authenticate(request, username=username, password=password)
 
             if user and user.is_staff:
@@ -40,30 +33,21 @@ def login_view(request):
                 return redirect('admin_dashboard')
             else:
                 messages.error(request, "Invalid Admin Credentials")
-                return redirect('/')
 
-        # ================= STUDENT LOGIN =================
+        # ================= STUDENT DIRECT LOGIN =================
         elif role == "student":
             enrollment = request.POST.get('enrollment')
 
-            if not enrollment:
-                messages.error(request, "Please enter enrollment number")
-                return redirect('/')
+            if enrollment:
+                user, created = User.objects.get_or_create(username=enrollment)
+            else:
+                user, created = User.objects.get_or_create(username="guest_student")
 
-            # Only get or create once
-            user, created = User.objects.get_or_create(username=enrollment)
-
-            # Only set unusable password when user is new
-            if created:
-                user.set_unusable_password()
-                user.save()
+            user.set_unusable_password()
+            user.save()
 
             login(request, user)
             return redirect('student_dashboard')
-
-        else:
-            messages.error(request, "Invalid role selected")
-            return redirect('/')
 
     return render(request, 'login.html')
 
@@ -78,24 +62,19 @@ def logout_view(request):
 # =========================
 # ADMIN DASHBOARD
 # =========================
-from django.contrib.auth.decorators import login_required, user_passes_test
-from django.shortcuts import render
-
-# ✅ Staff check function
-def is_admin(user):
-    return user.is_staff
+from django.contrib.auth.decorators import login_required
 
 @login_required
-@user_passes_test(is_admin)
 def admin_dashboard(request):
-    context = {
-        'departments': Department.objects.all(),
-        'semesters': Semester.objects.select_related('department'),
-        'faculties': Faculty.objects.all(),
-        'subjects': Subject.objects.select_related('department'),
-    }
+    if not request.user.is_staff:
+        return redirect('student_dashboard')
 
-    return render(request, 'admin_dashboard.html', context)
+    return render(request, 'admin_dashboard.html', {
+        'departments': Department.objects.all(),
+        'semesters': Semester.objects.all(),
+        'faculties': Faculty.objects.all(),
+        'subjects': Subject.objects.all(),
+    })
 
 # =========================
 # GENERATE TIMETABLE
@@ -272,58 +251,78 @@ def timetable_view(request):
 # STUDENT DASHBOARD
 # =========================
 from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
 from .models import *
 
-@login_required
 def student_dashboard(request):
     departments = Department.objects.all()
+    semesters = Semester.objects.select_related('department')
 
-    # ✅ Default values (important fix)
-    selected_department = request.GET.get('department', 'all')
-    selected_semester = request.GET.get('semester', 'all')
+    # ✅ PROPER UNIQUE TIMESLOTS (no duplicates)
+    slots = TimeSlot.objects.order_by('start_time', 'end_time')
+    unique_slots = []
+    seen = set()
 
-    # =========================
-    # TIME SLOTS (optimized)
-    # =========================
-    slots = TimeSlot.objects.order_by('start_time', 'end_time').distinct('start_time', 'end_time')
+    for slot in slots:
+        key = (slot.start_time, slot.end_time)
+        if key not in seen:
+            seen.add(key)
+            unique_slots.append(slot)
 
     days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
-    # =========================
-    # SEMESTER FILTER (clean)
-    # =========================
-    if selected_department != "all":
-        semesters = Semester.objects.filter(department_id=selected_department)
-    else:
-        semesters = Semester.objects.select_related('department')
+    selected_department = request.GET.get('department')
+    selected_semester = request.GET.get('semester')
 
-    # =========================
-    # TIMETABLE QUERY
-    # =========================
     timetable_qs = Timetable.objects.select_related(
         'subject', 'faculty', 'classroom', 'timeslot', 'semester__department'
     )
 
+    if (
+        selected_department != "all"
+        and selected_semester != "all"
+    ):
+        try:
+            sem = Semester.objects.get(id=selected_semester)
+
+            if str(sem.department_id) != str(selected_department):
+                selected_semester = "all"
+
+        except Semester.DoesNotExist:
+            selected_semester = "all"
+    # =========================
+    # Department-based semester dropdown
+    # Only show valid semesters
+    # =========================
+    if selected_department != "all":
+        semesters = Semester.objects.filter(
+            department_id=selected_department
+        )
+    else:
+        semesters = Semester.objects.select_related(
+            'department'
+        )
+
+    # ✅ FILTERS
+    # Department filter
     if selected_department != "all":
         timetable_qs = timetable_qs.filter(
             semester__department_id=selected_department
         )
 
+    # Semester filter
     if selected_semester != "all":
         timetable_qs = timetable_qs.filter(
             semester_id=selected_semester
         )
 
-    # =========================
-    # GROUPING
-    # =========================
+    # ✅ GROUPING LOGIC
     grouped_data = {}
 
     for entry in timetable_qs:
         title = f"{entry.semester.department.name} - Sem {entry.semester.semester_number}"
 
-        grouped_data.setdefault(title, {})
+        if title not in grouped_data:
+            grouped_data[title] = {}
 
         key = f"{entry.timeslot.day}_{entry.timeslot.start_time.strftime('%H:%M')}"
         grouped_data[title][key] = entry
@@ -331,9 +330,11 @@ def student_dashboard(request):
     return render(request, 'student_dashboard.html', {
         'departments': departments,
         'semesters': semesters,
-        'slots': slots,
+        'slots': unique_slots,  # ✅ FIXED
         'days': days,
         'grouped_data': grouped_data,
+
+        # ✅ IMPORTANT (dropdown selected value maintain karega)
         'selected_department': selected_department,
         'selected_semester': selected_semester,
     })
