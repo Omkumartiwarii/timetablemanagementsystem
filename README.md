@@ -1,54 +1,32 @@
 1. Data Fetching Issue
 
     Description:
-        The timetable data stored in the database is not being displayed on the student dashboard or admin dashboard timetable.
+        The subjects stored in the database are not fectching correctly for all semester .
 
     Symptoms:
-        Dashboard loads successfully
-        No timetable data appears despite existing records
+        In generating timetable some subjects didn't appears in timetable.
 
-    Possible Causes:
-        Incorrect or missing queryset (timetable_qs) in the backend
-        Improper filtering logic
-        Template not rendering the correct context variables
 
-2. Department & Semester Filtering Not Working
+2. More than one class on same day for a subject
 
     Description:
-        Selecting a department or semester does not update the timetable dynamically.
+        For one subject there are more than on classess per day are alloted.
 
     Symptoms:
-        Dropdown selection has no effect
-        Same (or empty) timetable is displayed
+        One subject got alloted in different alot in same day.
 
-    Possible Causes:
-        Form data not being submitted correctly (GET/POST issue)
-        Selected values not passed to backend
-        Incorrect filtering logic in view
-
-3. PDF Download Feature Not Working
+3. Different faculties for a subject in same semester  
 
     Description:
-        The "Download PDF" button is present but not functional.
+        For on subject different faculties got alloted for different day schedule
+        No single faculty for one subject in one semester
 
-    Possible Causes:
-        Missing backend implementation
-        JavaScript function not properly defined
+4. Subject Credit is missing
+   
+     Description:
+        no credit is define for subject which leads to number of classes diferent from actual running timetable.
 
-
-⚠️ Timetable Generation Algorithm Issue:
-    1. Weekly Class Limit Violation:
-    
-        The algorithm does not properly enforce the limit of maximum 3 classes per subject per week, resulting in over-allocation and an unbalanced timetable.
-
-    2. Duplicate Subject in a Day
-
-        A subject is sometimes scheduled more than once in a single day, which violates the rule of one class per subject per day and reduces timetable quality.
-
-    3. Incomplete Data Fetching
-
-        The system fails to retrieve full data from the database, leading to partial timetable generation with missing subjects and fewer classes.
-
+   
 📌 Summary
     ❌ Weekly constraints not enforced
     ❌ Duplicate subject allocation in a day
