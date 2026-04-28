@@ -11,7 +11,11 @@ body {
   background: linear-gradient(135deg, #667eea, #764ba2);
   min-height: 100vh;
 }
-
+/* 🔥 SCROLL LOCK */
+.no-scroll {
+  overflow: hidden;
+  height: 100vh;
+}
 /* ================= SIDEBAR ================= */
 .sidebar {
   width: 260px;
