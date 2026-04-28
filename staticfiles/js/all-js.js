@@ -6,11 +6,10 @@ function toggleMenu() {
   const isOpen = sidebar.classList.toggle("active");
   overlay.classList.toggle("active");
 
-  if (isOpen) {
-    btn.textContent = "✖";
-  } else {
-    btn.textContent = "☰";
-  }
+  // 🔥 SCROLL LOCK
+  document.body.classList.toggle("no-scroll", isOpen);
+
+  btn.textContent = isOpen ? "✖" : "☰";
 }
 
 document.getElementById("overlay").addEventListener("click", function () {
@@ -19,6 +18,9 @@ document.getElementById("overlay").addEventListener("click", function () {
 
   sidebar.classList.remove("active");
   this.classList.remove("active");
+
+  // 🔥 SCROLL UNLOCK
+  document.body.classList.remove("no-scroll");
 
   btn.textContent = "☰";
 });
