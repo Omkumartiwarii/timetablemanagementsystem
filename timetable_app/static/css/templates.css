@@ -12,11 +12,6 @@ body {
   min-height: 100vh;
 }
 
-/* 🔥 SCROLL LOCK */
-.no-scroll {
-  overflow: hidden;
-  height: 100vh;
-}
 /* ================= SIDEBAR ================= */
 .sidebar {
   width: 260px;
