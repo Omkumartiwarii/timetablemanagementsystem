@@ -104,31 +104,37 @@
         {% if faculties != None %}
         <h3 style="text-align: center; margin-top: 30px">Faculty List</h3>
 
-        <table>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Department</th>
-            <th>Action</th>
-          </tr>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Department</th>
+                <th>Action</th>
+              </tr>
+            </thead>
 
-          {% for f in faculties %}
-          <tr>
-            <td>{{ f.name }}</td>
-            <td>{{ f.email }}</td>
-            <td>{{ f.department }}</td>
-            <td>
-              <a
-                href="{% url 'delete_faculty' f.id %}"
-                onclick="return confirm('Delete this faculty?');"
-                style="color: red; font-weight: bold"
-              >
-                Remove
-              </a>
-            </td>
-          </tr>
-          {% endfor %}
-        </table>
+            <tbody>
+              {% for f in faculties %}
+              <tr>
+                <td data-label="Name">{{ f.name }}</td>
+                <td data-label="Email">{{ f.email }}</td>
+                <td data-label="Department">{{ f.department }}</td>
+                <td data-label="Action">
+                  <a
+                    href="{% url 'delete_faculty' f.id %}"
+                    class="btn-delete"
+                    onclick="return confirm('Delete this faculty?');"
+                  >
+                    Remove
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
         {% endif %}
       </div>
     </div>

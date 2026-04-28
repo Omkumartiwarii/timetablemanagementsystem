@@ -10,6 +10,7 @@ body {
   display: flex;
   background: linear-gradient(135deg, #667eea, #764ba2);
   min-height: 100vh;
+  overflow-x: hidden; /* 🔥 prevent layout break */
 }
 
 /* ================= SIDEBAR ================= */
@@ -78,12 +79,7 @@ body {
 }
 
 .menu a:hover {
-  background: linear-gradient(
-    135deg,
-    rgba(15, 23, 42, 0.6),
-    rgba(39, 77, 83, 0.6),
-    rgba(92, 104, 120, 0.6)
-  );
+  background: rgba(255, 255, 255, 0.1);
   padding-left: 20px;
 }
 
@@ -100,10 +96,6 @@ body {
   color: white;
   text-decoration: none;
   border-radius: 8px;
-}
-
-.bottom-links a:hover {
-  background: rgba(255, 255, 255, 0.1);
 }
 
 /* ================= OVERLAY ================= */
@@ -128,25 +120,23 @@ body {
 /* ================= MAIN ================= */
 .main {
   margin-left: 260px;
-  width: 100%;
+  width: calc(100% - 260px); /* 🔥 FIX */
+  overflow-x: hidden;
 }
 
 /* ================= TOPBAR ================= */
 .topbar {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+
   padding: 15px 20px;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   color: white;
 }
 
-.topbar-left h2 {
-  font-size: 18px;
-}
-
 .topbar-right {
-  margin-left: auto;
   display: flex;
   gap: 20px;
 }
@@ -160,8 +150,9 @@ body {
 .menu-toggle {
   display: none;
   position: fixed;
-  right: 15px;
-  font-size: 28px;
+  left: 15px;
+  top: 15px;
+  font-size: 26px;
   color: white;
   z-index: 2000;
   cursor: pointer;
@@ -170,6 +161,8 @@ body {
 /* ================= CONTENT ================= */
 .content {
   padding: 40px;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 /* ================= STATS ================= */
@@ -177,7 +170,6 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 20px;
-  margin-bottom: 30px;
 }
 
 .card-box {
@@ -189,7 +181,7 @@ body {
   text-align: center;
 }
 
-/* ================= CARD / FORM ================= */
+/* ================= CARD ================= */
 .card {
   background: white;
   padding: 30px;
@@ -198,11 +190,7 @@ body {
   margin: auto;
 }
 
-label {
-  display: block;
-  margin-top: 12px;
-}
-
+/* ================= FORM ================= */
 input,
 select,
 button {
@@ -213,34 +201,31 @@ button {
   border: 1px solid #ccc;
 }
 
-input:focus,
-select:focus {
-  border-color: #667eea;
-  outline: none;
-  box-shadow: 0 0 5px rgba(102, 126, 234, 0.4);
-}
-
-.btn {
-  margin-top: 15px;
-  background: #667eea;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-
 /* ================= TABLE ================= */
 .table-card {
   background: white;
   padding: 25px;
   border-radius: 12px;
   margin-top: 30px;
-  overflow-x: auto;
+
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto; /* ✅ scroll inside */
+}
+
+/* Scrollbar */
+.table-card::-webkit-scrollbar {
+  height: 8px;
+}
+.table-card::-webkit-scrollbar-thumb {
+  background: #667eea;
+  border-radius: 10px;
 }
 
 table {
   width: 100%;
+  min-width: 800px; /* 🔥 desktop scroll */
   border-collapse: collapse;
-  table-layout: fixed;
 }
 
 th,
@@ -248,7 +233,6 @@ td {
   padding: 12px;
   text-align: center;
   border-bottom: 1px solid #eee;
-  word-wrap: break-word;
 }
 
 th {
@@ -272,6 +256,7 @@ tr:nth-child(even) {
 
   .main {
     margin-left: 0;
+    width: 100%;
   }
 
   .menu-toggle {
@@ -286,12 +271,9 @@ tr:nth-child(even) {
     padding: 20px;
   }
 
-  .logo-box {
-    justify-content: flex-start;
-  }
-
+  /* 🔥 TABLE FIX */
   table {
-    min-width: 700px;
+    min-width: 100%; /* no overflow on mobile */
   }
 }
 
