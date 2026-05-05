@@ -89,25 +89,26 @@ def generate_view(request):
         return redirect('student_dashboard')
 
     def generate_for_semesters(sem_list):
+
         for sem in sem_list:
-            Timetable.objects.filter(semester=sem).delete()
 
-            schedule = generate_timetable(sem)
+            try:
+                print(f"Generating for {sem}")
 
-            if not schedule:
-                continue
+                # generate_timetable now already:
+                # 1 deletes old entries
+                # 2 generates theory
+                # 3 saves theory
+                # 4 assigns labs
+                result = generate_timetable(sem)
 
-            for entry in schedule:
-                try:
-                    Timetable.objects.create(
-                        semester=sem,
-                        subject=entry.get('subject'),
-                        faculty=entry.get('faculty'),
-                        classroom=entry.get('classroom'),
-                        timeslot=entry.get('slot')
-                    )
-                except Exception as e:
-                    print("Save Error:", e)
+                if not result:
+                    messages.warning(request, f"{sem}: No timetable generated")
+                else:
+                    messages.success(request, f"{sem}: Timetable generated ({len(result)} entries)")
+
+            except Exception as e:
+                print("Generation Error:", e)
 
     # ================= AUTO GENERATE =================
     if request.GET.get('auto'):
@@ -160,10 +161,11 @@ def timetable_view(request):
     # ✅ optimized query
     data = Timetable.objects.select_related(
         'subject',
-        'faculty',
         'classroom',
         'semester__department',
         'timeslot'
+    ).prefetch_related(
+    'faculty'
     )
 
     # =========================
@@ -583,6 +585,18 @@ def add_timeslot(request):
     }
 
     return render(request, 'add_timeslot.html', context)
+
+# Add Faculty
+# def add_faculty(request):
+#     if request.method == "POST":
+#         form = FacultyForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('add_faculty')  # reload page after save
+#     else:
+#         form = FacultyForm()
+
+#     return render(request, 'add_faculty.html', {'form': form})
 
 # Home View (Optional)
 from django.shortcuts import render
