@@ -1,339 +1,409 @@
 import random
-from .models import Subject, SubjectFaculty, Classroom, TimeSlot
 
-POPULATION_SIZE = 8
-GENERATIONS = 30
-MUTATION_RATE = 0.2
+from .models import (
+    Subject,
+    SubjectFaculty,
+    Classroom,
+    TimeSlot,
+    Timetable
+)
+
+MAX_FACULTY_PER_DAY = 4
+MAX_RETRIES = 200
 
 
-# =========================
-# ✅ GLOBAL VALIDATION
-# =========================
-def is_valid_timetable(timetable):
+# -----------------------------------
+# Utility
+# -----------------------------------
 
-    used_faculty = set()
-    used_rooms = set()
-    used_group = set()
-
-    faculty_count = {}
-    semester_room_map = {}
-    faculty_schedule = {}
-
-    for entry in timetable:
-
-        slot = entry['slot']
-        faculty = entry['faculty']
-        room = entry['classroom']
-
-        group_id = (
-            entry['subject'].semester.department.id,
-            entry['subject'].semester.semester_number
+def all_slots():
+    return list(
+        TimeSlot.objects.all().order_by(
+            "day","order"
         )
-
-        # -------------------
-        # Clash checks
-        # -------------------
-        if (slot.id, faculty.id) in used_faculty:
-            return False
-
-        if (slot.id, room.id) in used_rooms:
-            return False
-
-        if (slot.id, group_id) in used_group:
-            return False
-
-        used_faculty.add((slot.id, faculty.id))
-        used_rooms.add((slot.id, room.id))
-        used_group.add((slot.id, group_id))
-
-        # -------------------
-        # Faculty weekly limit (max 3)
-        # -------------------
-        faculty_count[faculty.id] = faculty_count.get(faculty.id, 0) + 1
-        if faculty_count[faculty.id] > 3:
-            return False
-
-        # -------------------
-        # Same semester same classroom
-        # -------------------
-        sem_id = entry['subject'].semester.id
-
-        if sem_id in semester_room_map:
-            if semester_room_map[sem_id] != room.id:
-                return False
-        else:
-            semester_room_map[sem_id] = room.id
-
-        # -------------------
-        # No continuous classes
-        # -------------------
-        key = (faculty.id, slot.day)
-
-        if key not in faculty_schedule:
-            faculty_schedule[key] = []
-
-        faculty_schedule[key].append(slot.order)
-
-    # Check continuous slots
-    for orders in faculty_schedule.values():
-        orders.sort()
-        for i in range(len(orders) - 1):
-            if orders[i+1] - orders[i] == 1:
-                return False
-
-    return True
-
-
-# =========================
-# ✅ SAFE ASSIGNMENT
-# =========================
-def get_safe_assignment(timetable, subject, faculty_list, rooms, slots):
-
-    random.shuffle(slots)
-    random.shuffle(rooms)
-    random.shuffle(faculty_list)
-
-    group_id = (
-        subject.semester.department.id,
-        subject.semester.semester_number
     )
 
-    for slot in slots:
-        for room in rooms:
-            for faculty in faculty_list:
 
-                clash = False
+def consecutive_pairs():
 
-                # Faculty weekly count
-                count = sum(1 for e in timetable if e['faculty'] == faculty)
-                if count >= 3:
-                    continue
+    pairs=[]
 
-                for entry in timetable:
+    days=[
+        "Monday","Tuesday",
+        "Wednesday","Thursday",
+        "Friday","Saturday"
+    ]
 
-                    if entry['slot'] == slot and entry['faculty'] == faculty:
-                        clash = True
+    for d in days:
 
-                    if entry['slot'] == slot and entry['classroom'] == room:
-                        clash = True
+        ds=list(
+            TimeSlot.objects.filter(
+                day=d
+            ).order_by("order")
+        )
 
-                    if (
-                        entry['slot'] == slot and
-                        (
-                            entry['subject'].semester.department.id,
-                            entry['subject'].semester.semester_number
-                        ) == group_id
-                    ):
-                        clash = True
+        for i in range(
+            len(ds)-1
+        ):
+            if ds[i+1].order == ds[i].order+1:
 
-                    # No continuous classes
-                    if entry['faculty'] == faculty and entry['slot'].day == slot.day:
-                        if abs(entry['slot'].order - slot.order) == 1:
-                            clash = True
+                pairs.append(
+                    (ds[i],ds[i+1])
+                )
 
-                    if clash:
-                        break
-
-                if not clash:
-                    return slot, room, faculty
-
-    return None, None, None
+    return pairs
 
 
-# =========================
-# ✅ CREATE INDIVIDUAL
-# =========================
-def create_individual(semester):
+# -----------------------------------
+# HARD CONSTRAINT CHECKS
+# -----------------------------------
 
-    if semester.department.name == "ALL":
-        subjects = list(
-            Subject.objects.filter(
-                semester__semester_number=semester.semester_number
+def faculty_load(schedule,faculty,day):
+
+    return sum(
+        1 for e in schedule
+        if faculty in e["faculties"]
+        and e["slot"].day==day
+    )
+
+
+def faculty_adjacent(schedule,faculty,slot):
+
+    for e in schedule:
+
+        if (
+            faculty in e["faculties"]
+            and
+            e["slot"].day==slot.day
+            and abs(
+                e["slot"].order -
+                slot.order
+            )==1
+        ):
+            return True
+
+    return False
+
+
+def clash(
+    schedule,
+    semester,
+    slot,
+    room,
+    faculties
+):
+
+    for e in schedule:
+
+        # semester only one class
+        if (
+            e["semester"].id==semester.id
+            and e["slot"]==slot
+        ):
+            return True
+
+        # room clash
+        if (
+            e["slot"]==slot
+            and e["room"]==room
+        ):
+            return True
+
+        # faculty clash
+        for f in faculties:
+            if (
+                e["slot"]==slot
+                and f in e["faculties"]
+            ):
+                return True
+
+    return False
+
+
+# -----------------------------------
+# SUBJECT DEMANDS
+# -----------------------------------
+
+def build_demands(semester):
+
+    demands=[]
+
+    subs=Subject.objects.filter(
+        semester=semester
+    )
+
+    for s in subs:
+
+        maps=list(
+            SubjectFaculty.objects.filter(
+                subject=s
             )
         )
-    else:
-        subjects = list(Subject.objects.filter(semester=semester))
 
-    rooms = list(Classroom.objects.all())
-    slots = list(TimeSlot.objects.all())
-
-    timetable = []
-    semester_room_map = {}
-
-    for sub in subjects:
-
-        mappings = SubjectFaculty.objects.filter(subject=sub)
-        if not mappings.exists():
+        if not maps:
             continue
 
-        faculty_list = [m.faculty for m in mappings]
-        lectures = getattr(sub, "lectures_per_week", 3)
+        # THEORY
+        if not s.is_lab:
 
-        # Fixed classroom per semester
-        sem_id = sub.semester.id
+            one_faculty=random.choice(
+                maps
+            ).faculty
 
-        if sem_id not in semester_room_map:
-            semester_room_map[sem_id] = random.choice(rooms)
+            periods=s.credits
 
-        fixed_room = semester_room_map[sem_id]
+            for _ in range(periods):
 
-        for _ in range(lectures):
+                demands.append({
+                    "type":"theory",
+                    "subject":s,
+                    "faculties":[one_faculty]
+                })
 
-            slot, room, faculty = get_safe_assignment(
-                timetable, sub, faculty_list, [fixed_room], slots
-            )
 
-            if slot is None:
+        # LAB
+        else:
+
+            if len(maps)<2:
                 continue
 
-            timetable.append({
-                'subject': sub,
-                'faculty': faculty,
-                'classroom': room,
-                'slot': slot
-            })
+            if s.credits==2:
+                sessions=1
+            elif s.credits==3:
+                sessions=2
+            else:
+                sessions=1
 
-    return timetable
+            for _ in range(sessions):
 
+                demands.append({
+                    "type":"lab",
+                    "subject":s,
+                    "faculties":[
+                        maps[0].faculty,
+                        maps[1].faculty
+                    ]
+                })
 
-# =========================
-# ✅ FITNESS
-# =========================
-def fitness(timetable, semester):
+    # labs first
+    demands.sort(
+        key=lambda x:
+        0 if x["type"]=="lab"
+        else 1
+    )
 
-    score = 0
-    subject_day_map = {}
-
-    for entry in timetable:
-
-        subject = entry['subject']
-        day = entry['slot'].day
-
-        key = (subject.id, day)
-
-        if key in subject_day_map:
-            score -= 5
-        else:
-            score += 5
-
-        subject_day_map[key] = True
-
-    return score
+    return demands
 
 
-# =========================
-# ✅ SELECTION
-# =========================
-def selection(population, semester):
-    population.sort(key=lambda x: fitness(x, semester), reverse=True)
-    return population[:2]
+# -----------------------------------
+# TRY BUILD FULL SCHEDULE
+# -----------------------------------
 
+def try_construct(semester):
 
-# =========================
-# ✅ CROSSOVER
-# =========================
-def crossover(parent1, parent2, semester):
+    theory_rooms=list(
+        Classroom.objects.filter(
+            is_lab=False
+        )
+    )
 
-    child = []
-    combined = parent1 + parent2
-    random.shuffle(combined)
+    lab_rooms=list(
+        Classroom.objects.filter(
+            is_lab=True
+        )
+    )
 
-    for entry in combined:
-        temp = child + [entry]
-        if is_valid_timetable(temp):
-            child.append(entry)
+    if not theory_rooms:
+        return None
 
-    return child
+    fixed_room=random.choice(
+        theory_rooms
+    )
 
+    schedule=[]
 
-# =========================
-# ✅ MUTATION
-# =========================
-def mutate(timetable):
+    demands=build_demands(
+        semester
+    )
 
-    timeslots = list(TimeSlot.objects.all())
+    for d in demands:
 
-    for _ in range(2):
+        placed=False
 
-        if not timetable:
-            return timetable
+        # -----------------
+        # LAB
+        # -----------------
 
-        index = random.randint(0, len(timetable) - 1)
-        entry = timetable[index]
+        if d["type"]=="lab":
 
-        for _ in range(10):
+            pairs=consecutive_pairs()
+            random.shuffle(pairs)
 
-            new_slot = random.choice(timeslots)
+            for s1,s2 in pairs:
 
-            clash = False
+                room=random.choice(
+                    lab_rooms
+                )
 
-            for e in timetable:
+                bad=False
 
-                if e == entry:
+                for f in d["faculties"]:
+
+                    if (
+                       faculty_load(
+                          schedule,
+                          f,
+                          s1.day
+                       )
+                       >=
+                       MAX_FACULTY_PER_DAY
+                    ):
+                        bad=True
+
+                if bad:
                     continue
 
-                if (
-                    e['slot'] == new_slot and
-                    (
-                        e['faculty'] == entry['faculty'] or
-                        e['classroom'] == entry['classroom'] or
-                        e['subject'].semester == entry['subject'].semester
-                    )
+                if clash(
+                    schedule,
+                    semester,
+                    s1,
+                    room,
+                    d["faculties"]
                 ):
-                    clash = True
+                    continue
 
-                # continuous check
-                if e['faculty'] == entry['faculty'] and e['slot'].day == new_slot.day:
-                    if abs(e['slot'].order - new_slot.order) == 1:
-                        clash = True
+                if clash(
+                    schedule,
+                    semester,
+                    s2,
+                    room,
+                    d["faculties"]
+                ):
+                    continue
 
-                if clash:
-                    break
 
-            if not clash:
-                entry['slot'] = new_slot
+                schedule.append({
+                    "semester":semester,
+                    "subject":d["subject"],
+                    "faculties":d["faculties"],
+                    "room":room,
+                    "slot":s1
+                })
+
+                schedule.append({
+                    "semester":semester,
+                    "subject":d["subject"],
+                    "faculties":d["faculties"],
+                    "room":room,
+                    "slot":s2
+                })
+
+                placed=True
                 break
 
-    return timetable
+
+        # -----------------
+        # THEORY
+        # -----------------
+
+        else:
+
+            slots=all_slots()
+            random.shuffle(slots)
+
+            f=d["faculties"][0]
+
+            for slot in slots:
+
+                if faculty_load(
+                    schedule,
+                    f,
+                    slot.day
+                )>=MAX_FACULTY_PER_DAY:
+                    continue
+
+                if faculty_adjacent(
+                    schedule,
+                    f,
+                    slot
+                ):
+                    continue
+
+                if clash(
+                    schedule,
+                    semester,
+                    slot,
+                    fixed_room,
+                    [f]
+                ):
+                    continue
 
 
-# =========================
-# ✅ MAIN FUNCTION
-# =========================
-def generate_timetable(semester):
+                schedule.append({
+                    "semester":semester,
+                    "subject":d["subject"],
+                    "faculties":[f],
+                    "room":fixed_room,
+                    "slot":slot
+                })
 
-    population = []
+                placed=True
+                break
 
-    while len(population) < POPULATION_SIZE:
-        ind = create_individual(semester)
-        if is_valid_timetable(ind):
-            population.append(ind)
 
-    for generation in range(GENERATIONS):
+        # if any demand unscheduled -> fail
+        if not placed:
+            return None
 
-        parents = selection(population, semester)
-        best = parents[0]
+    return schedule
 
-        new_population = [best]
 
-        while len(new_population) < POPULATION_SIZE:
+# -----------------------------------
+# MAIN GENERATOR
+# -----------------------------------
 
-            child = crossover(parents[0], parents[1], semester)
+def generate_timetable(
+    semester
+):
 
-            if random.random() < MUTATION_RATE:
-                child = mutate(child)
+    Timetable.objects.filter(
+        semester=semester
+    ).delete()
 
-            # ✅ FIXED VALIDATION LOOP
-            while not is_valid_timetable(child):
-                child = create_individual(semester)
+    final_schedule=None
 
-            new_population.append(child)
+    # retry until feasible
+    for _ in range(
+        MAX_RETRIES
+    ):
 
-        population = new_population
-        print(f"Generation {generation} done")
+        s=try_construct(
+            semester
+        )
 
-    best = max(population, key=lambda x: fitness(x, semester))
+        if s:
+            final_schedule=s
+            break
 
-    print("FINAL BEST:", best)  # 🔥 DEBUG
 
-    return best
+    if not final_schedule:
+        raise Exception(
+          f"No feasible timetable for {semester}"
+        )
+
+
+    # save
+    for e in final_schedule:
+
+        row=Timetable.objects.create(
+            semester=e["semester"],
+            subject=e["subject"],
+            classroom=e["room"],
+            timeslot=e["slot"]
+        )
+
+        row.faculty.set(
+            e["faculties"]
+        )
+
+    return final_schedule
