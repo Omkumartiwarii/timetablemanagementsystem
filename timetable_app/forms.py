@@ -71,7 +71,8 @@ class SubjectFacultyForm(forms.ModelForm):
 class ClassroomForm(forms.ModelForm):
     class Meta:
         model = Classroom
-        fields = ['room_number', 'capacity']
+        fields = ['room_number', 'is_lab','capacity']
+
 
 
 # =========================
