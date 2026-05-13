@@ -1,0 +1,596 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="TTGS - Smart Timetable Generator System for academic institutions. Conflict-free scheduling in seconds."
+    />
+    <title>TTGS — Smart Timetable Generator</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+
+    <link rel="stylesheet" href="{% static 'css/home.css' %}" />
+  </head>
+
+  <body>
+    <!-- NAVBAR -->
+    <nav
+      class="navbar"
+      id="navbar"
+      role="navigation"
+      aria-label="Main navigation"
+    >
+      <a class="brand" href="#">
+        <div class="logo-badge">
+          <span>TT<br />GS</span>
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">TTGS</span>
+          <span class="brand-sub">Academic Scheduler</span>
+        </div>
+      </a>
+
+      <button
+        class="menu-toggle"
+        id="menuToggle"
+        aria-label="Toggle navigation"
+        aria-expanded="false"
+      >
+        <span></span><span></span><span></span>
+      </button>
+
+      <div class="nav-links" id="navLinks">
+        <a href="#">Home</a>
+        <a href="#about">About</a>
+        <a href="#features">Features</a>
+        <a href="#how">How It Works</a>
+        <a href="#contact">Contact</a>
+        <a href="/login/" class="login-btn">Login →</a>
+      </div>
+    </nav>
+
+    <!-- MOBILE MENU -->
+    <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+      <div class="mobile-menu-inner">
+        <div class="mobile-menu-links">
+          <a href="#">Home</a>
+          <a href="#about">About</a>
+          <a href="#features">Features</a>
+          <a href="#how">How It Works</a>
+          <a href="#contact">Contact</a>
+          <a href="/login/" class="mobile-cta">Login →</a>
+        </div>
+        <div class="mobile-menu-footer">
+          <a href="#">Instagram</a>
+          <a href="#">LinkedIn</a>
+          <a href="#">GitHub</a>
+        </div>
+      </div>
+    </div>
+    <div class="overlay" id="overlay"></div>
+
+    <!-- ═══════════════════ HERO ═══════════════════ -->
+    <section class="hero" aria-label="Hero section">
+      <div class="hero-deco">T</div>
+
+      <!-- LEFT -->
+      <div class="hero-left">
+        <div class="hero-eyebrow">Academic Scheduling System</div>
+
+        <h1>
+          Schedule<br />
+          <em>Smarter.</em><br />
+          Teach Better.
+        </h1>
+
+        <p class="hero-desc">
+          TTGS automates timetable generation for schools and colleges —
+          assigning faculty, subjects, and classrooms with zero conflicts and
+          maximum efficiency.
+        </p>
+
+        <div class="hero-actions">
+          <a href="/login/" class="btn-primary">
+            <i class="fa-solid fa-arrow-right"></i>
+            Get Started
+          </a>
+          <a href="#features" class="btn-ghost">
+            Explore Features
+            <i class="fa-solid fa-chevron-down" style="font-size: 11px"></i>
+          </a>
+        </div>
+
+        <div class="hero-stats-strip">
+          <div class="stat-item">
+            <div class="stat-num">0</div>
+            <div class="stat-label">Scheduling Conflicts</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">&lt;5s</div>
+            <div class="stat-label">Generation Time</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">100%</div>
+            <div class="stat-label">Faculty Coverage</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT — CAROUSEL -->
+      <div class="hero-right">
+        <div class="carousel-slides">
+          <!-- Slide 1 -->
+          <div class="slide active">
+            <div class="slide-card">
+              <span class="slide-tag">Core Feature</span>
+              <h3>Instant Timetable Generation</h3>
+              <p>
+                Input your faculty, subjects, and rooms. TTGS generates a
+                complete, conflict-free weekly schedule in seconds using
+                intelligent scheduling algorithms.
+              </p>
+              <div class="slide-pills">
+                <span class="slide-pill">⚡ Fast</span>
+                <span class="slide-pill">🎯 Zero Clash</span>
+                <span class="slide-pill">📊 Optimized</span>
+              </div>
+            </div>
+          </div>
+          <!-- Slide 2 -->
+          <div class="slide">
+            <div class="slide-card">
+              <span class="slide-tag">Management</span>
+              <h3>Faculty &amp; Room Management</h3>
+              <p>
+                Manage teacher assignments, track workload distribution, and
+                allocate classrooms intelligently — all from a single dashboard
+                interface.
+              </p>
+              <div class="slide-pills">
+                <span class="slide-pill">👨‍🏫 Faculty</span>
+                <span class="slide-pill">🏫 Rooms</span>
+                <span class="slide-pill">📅 Slots</span>
+              </div>
+            </div>
+          </div>
+          <!-- Slide 3 -->
+          <div class="slide">
+            <div class="slide-card">
+              <span class="slide-tag">Scalability</span>
+              <h3>Built for Every Institution</h3>
+              <p>
+                From small schools to large multi-department colleges, TTGS
+                scales effortlessly. Secure, role-based access ensures the right
+                people see the right data.
+              </p>
+              <div class="slide-pills">
+                <span class="slide-pill">🔒 Secure</span>
+                <span class="slide-pill">🌐 Scalable</span>
+                <span class="slide-pill">🏛️ Academic</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dots" role="tablist">
+          <span
+            class="dot active"
+            role="tab"
+            aria-label="Slide 1"
+            onclick="currentSlide(0)"
+          ></span>
+          <span
+            class="dot"
+            role="tab"
+            aria-label="Slide 2"
+            onclick="currentSlide(1)"
+          ></span>
+          <span
+            class="dot"
+            role="tab"
+            aria-label="Slide 3"
+            onclick="currentSlide(2)"
+          ></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- MARQUEE -->
+    <div class="marquee-band" aria-hidden="true">
+      <div class="marquee-track">
+        <span class="marquee-item">Smart Scheduling</span>
+        <span class="marquee-item">Zero Conflicts</span>
+        <span class="marquee-item">Faculty Management</span>
+        <span class="marquee-item">Room Allocation</span>
+        <span class="marquee-item">Academic Excellence</span>
+        <span class="marquee-item">Automated Timetables</span>
+        <span class="marquee-item">Instant Generation</span>
+        <span class="marquee-item">Secure System</span>
+        <span class="marquee-item">Smart Scheduling</span>
+        <span class="marquee-item">Zero Conflicts</span>
+        <span class="marquee-item">Faculty Management</span>
+        <span class="marquee-item">Room Allocation</span>
+        <span class="marquee-item">Academic Excellence</span>
+        <span class="marquee-item">Automated Timetables</span>
+        <span class="marquee-item">Instant Generation</span>
+        <span class="marquee-item">Secure System</span>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ ABOUT ═══════════════════ -->
+    <section
+      id="about"
+      class="section about-section"
+      aria-labelledby="about-heading"
+    >
+      <div class="section-header">
+        <div>
+          <div class="section-eyebrow">About TTGS</div>
+          <h2 id="about-heading">
+            Academic scheduling,<br /><em>reimagined.</em>
+          </h2>
+        </div>
+      </div>
+
+      <div class="about-grid">
+        <div class="about-text-block fade-up">
+          <p>
+            <strong>TTGS (Timetable Generation System)</strong> was built to
+            eliminate the time-consuming, error-prone process of manual
+            timetable creation that plagues academic institutions every
+            semester.
+          </p>
+          <p>
+            Our intelligent scheduling engine considers faculty availability,
+            subject hours, room capacities, and institutional constraints —
+            generating optimized, conflict-free timetables that would take
+            humans days to create manually.
+          </p>
+          <p>
+            Designed for Indian educational institutions, TTGS supports complex
+            semester structures, multiple departments, and varying faculty
+            workloads — all within a clean, professional interface.
+          </p>
+        </div>
+
+        <div class="about-pillars fade-up">
+          <div class="pillar">
+            <div class="pillar-icon"><i class="fa-solid fa-bolt"></i></div>
+            <div>
+              <h4>Smart Allocation</h4>
+              <p>
+                Algorithms ensure every subject, faculty, and room is assigned
+                optimally without manual intervention.
+              </p>
+            </div>
+          </div>
+          <div class="pillar">
+            <div class="pillar-icon"><i class="fa-solid fa-clock"></i></div>
+            <div>
+              <h4>Saves Time</h4>
+              <p>
+                What takes a week of manual work is completed in seconds —
+                freeing administrators for higher-value tasks.
+              </p>
+            </div>
+          </div>
+          <div class="pillar">
+            <div class="pillar-icon">
+              <i class="fa-solid fa-chart-gantt"></i>
+            </div>
+            <div>
+              <h4>Optimized Scheduling</h4>
+              <p>
+                Balanced workload distribution and smart time-slot assignment
+                for an efficient academic experience.
+              </p>
+            </div>
+          </div>
+          <div class="pillar">
+            <div class="pillar-icon">
+              <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <div>
+              <h4>Secure &amp; Reliable</h4>
+              <p>
+                Role-based authentication and data protection ensure only
+                authorized personnel access sensitive schedules.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════ FEATURES ═══════════════════ -->
+    <section
+      id="features"
+      class="section features-section"
+      aria-labelledby="features-heading"
+    >
+      <div class="section-header">
+        <div>
+          <div class="section-eyebrow">Platform Features</div>
+          <h2 id="features-heading">
+            Everything your institution<br /><em>needs.</em>
+          </h2>
+        </div>
+      </div>
+
+      <div class="feature-grid">
+        <div class="feature-cell fade-up" data-index="01">
+          <div class="feature-icon"><i class="fa-solid fa-bolt"></i></div>
+          <h3>Instant Generation</h3>
+          <p>
+            Complete weekly timetables generated in under 5 seconds using highly
+            optimized scheduling logic built for academic constraints.
+          </p>
+        </div>
+        <div class="feature-cell fade-up" data-index="02">
+          <div class="feature-icon">
+            <i class="fa-solid fa-circle-check"></i>
+          </div>
+          <h3>Zero Collision</h3>
+          <p>
+            No overlapping classes, faculty double-bookings, or room conflicts —
+            mathematically guaranteed by our constraint-solving engine.
+          </p>
+        </div>
+        <div class="feature-cell fade-up" data-index="03">
+          <div class="feature-icon">
+            <i class="fa-solid fa-chalkboard-user"></i>
+          </div>
+          <h3>Faculty Management</h3>
+          <p>
+            Assign subjects to teachers, set availability windows, manage
+            workload caps, and track teaching hours per department.
+          </p>
+        </div>
+        <div class="feature-cell fade-up" data-index="04">
+          <div class="feature-icon">
+            <i class="fa-solid fa-building-columns"></i>
+          </div>
+          <h3>Room Allocation</h3>
+          <p>
+            Smart classroom assignment based on capacity, availability, and
+            subject type — maximizing facility utilization across your campus.
+          </p>
+        </div>
+        <div class="feature-cell fade-up" data-index="05">
+          <div class="feature-icon"><i class="fa-solid fa-lock"></i></div>
+          <h3>Secure Access</h3>
+          <p>
+            Role-based authentication for admins, faculty, and students. Your
+            academic data stays protected with granular access control.
+          </p>
+        </div>
+        <div class="feature-cell fade-up" data-index="06">
+          <div class="feature-icon"><i class="fa-solid fa-expand"></i></div>
+          <h3>Scalable Architecture</h3>
+          <p>
+            Works for 10 classrooms or 1,000. Designed for small schools, large
+            colleges, and multi-campus university systems equally.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════ HOW IT WORKS ═══════════════════ -->
+    <section id="how" class="section how-section" aria-labelledby="how-heading">
+      <div class="section-header">
+        <div>
+          <div class="section-eyebrow">Process</div>
+          <h2 id="how-heading">
+            From setup to schedule<br /><em>in four steps.</em>
+          </h2>
+        </div>
+      </div>
+
+      <div class="steps-grid">
+        <div class="step fade-up">
+          <div class="step-num">01</div>
+          <h4>Configure Institution</h4>
+          <p>
+            Set up departments, semesters, and academic structure. Input the
+            rules and constraints specific to your institution.
+          </p>
+        </div>
+        <div class="step fade-up">
+          <div class="step-num">02</div>
+          <h4>Add Faculty &amp; Subjects</h4>
+          <p>
+            Register teaching staff with their qualifications, availability, and
+            subject assignments. Add all courses and lab sessions.
+          </p>
+        </div>
+        <div class="step fade-up">
+          <div class="step-num">03</div>
+          <h4>Map Rooms &amp; Slots</h4>
+          <p>
+            Define classroom capacities and time slots for each day. Configure
+            lab schedules, breaks, and special periods.
+          </p>
+        </div>
+        <div class="step fade-up">
+          <div class="step-num">04</div>
+          <h4>Generate &amp; Export</h4>
+          <p>
+            Hit generate. Review the conflict-free timetable, make any manual
+            adjustments, and distribute to faculty and students.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════ CONTACT ═══════════════════ -->
+    <section
+      id="contact"
+      class="section contact-section"
+      aria-labelledby="contact-heading"
+    >
+      <div class="section-header">
+        <div>
+          <div class="section-eyebrow">Contact</div>
+          <h2 id="contact-heading">
+            Let's build your<br /><em>perfect schedule.</em>
+          </h2>
+        </div>
+      </div>
+
+      <div class="contact-layout">
+        <div class="contact-info fade-up">
+          <h3>Get in touch with the TTGS team</h3>
+          <p>
+            Have questions about integrating TTGS in your institution? Want a
+            walkthrough of the platform? We're here to help academic
+            administrators get started.
+          </p>
+
+          <div class="contact-items">
+            <div class="contact-item">
+              <div class="contact-icon">
+                <i class="fa-solid fa-envelope"></i>
+              </div>
+              <div class="contact-item-text">
+                <span class="contact-item-label">Email</span>
+                <span class="contact-item-val">support@ttgs.com</span>
+              </div>
+            </div>
+            <div class="contact-item">
+              <div class="contact-icon"><i class="fa-solid fa-phone"></i></div>
+              <div class="contact-item-text">
+                <span class="contact-item-label">Phone</span>
+                <span class="contact-item-val">+91 8700740710</span>
+              </div>
+            </div>
+            <div class="contact-item">
+              <div class="contact-icon">
+                <i class="fa-solid fa-location-dot"></i>
+              </div>
+              <div class="contact-item-text">
+                <span class="contact-item-label">Location</span>
+                <span class="contact-item-val">India</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Form -->
+        <div class="contact-form-wrap fade-up">
+          <div class="form-title">Send a Message</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Full Name</label>
+              <input type="text" placeholder="Mr. Om Kumar" />
+            </div>
+            <div class="form-group">
+              <label>Role</label>
+              <select>
+                <option>Select Role</option>
+                <option>Principal / Director</option>
+                <option>Academic Administrator</option>
+                <option>Faculty Member</option>
+                <option>Student</option>
+                <option>Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Institution Name</label>
+            <input type="text" placeholder="ABC Engineering College" />
+          </div>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" placeholder="name@institution.ac.in" />
+          </div>
+          <div class="form-group">
+            <label>Message</label>
+            <textarea
+              placeholder="Tell us about your institution's scheduling needs..."
+            ></textarea>
+          </div>
+          <button
+            class="submit-btn"
+            type="button"
+            onclick="handleFormSubmit(this)"
+          >
+            <i class="fa-solid fa-paper-plane"></i>
+            Send Message
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════ FOOTER ═══════════════════ -->
+    <footer class="footer" role="contentinfo">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <div class="brand">
+            <div class="logo-badge">
+              <span>TT<br />GS</span>
+            </div>
+            <div class="brand-text">
+              <span class="brand-name">TTGS</span>
+              <span class="brand-sub">Academic Scheduler</span>
+            </div>
+          </div>
+          <p class="footer-tagline">
+            Smart, conflict-free timetable generation for Indian academic
+            institutions.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h5>Navigation</h5>
+          <a href="#">Home</a>
+          <a href="#about">About</a>
+          <a href="#features">Features</a>
+          <a href="#how">How It Works</a>
+          <a href="#contact">Contact</a>
+        </div>
+
+        <div class="footer-col">
+          <h5>Platform</h5>
+          <a href="/login/">Admin Login</a>
+          <a href="#">Faculty Portal</a>
+          <a href="#">Student View</a>
+          <a href="#">Documentation</a>
+          <a href="#">Support</a>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span class="footer-copy"
+          >© 2026 TTGS — Smart Timetable Generator System. Built for academic
+          institutions.</span
+        >
+        <div class="socials">
+          <a href="#" aria-label="Instagram"
+            ><i class="fa-brands fa-instagram"></i
+          ></a>
+          <a href="#" aria-label="LinkedIn"
+            ><i class="fa-brands fa-linkedin-in"></i
+          ></a>
+          <a href="#" aria-label="GitHub"
+            ><i class="fa-brands fa-github"></i
+          ></a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="{% static 'js/home.js' %}"></script>
+  </body>
+</html>

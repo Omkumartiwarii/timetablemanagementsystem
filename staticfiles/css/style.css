@@ -1,0 +1,89 @@
+/* ===== GLOBAL ===== */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #f4f6f9;
+    margin: 0;
+}
+
+/* ===== NAVBAR ===== */
+.navbar {
+    background: #2c3e50;
+    color: white;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.navbar a {
+    color: white;
+    text-decoration: none;
+    margin-left: 20px;
+}
+
+/* ===== CARD ===== */
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* ===== BUTTONS ===== */
+.btn {
+    padding: 10px 15px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: #3498db;
+    color: white;
+}
+
+.btn-success {
+    background: #2ecc71;
+    color: white;
+}
+
+.btn-danger {
+    background: #e74c3c;
+    color: white;
+}
+
+/* ===== TABLE ===== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+th {
+    background: #3498db;
+    color: white;
+    padding: 10px;
+}
+
+td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+/* ===== TIMETABLE CELL ===== */
+.cell {
+    font-size: 13px;
+}
+
+.subject {
+    font-weight: bold;
+}
+
+.faculty {
+    color: #555;
+}
+
+.room {
+    font-size: 12px;
+    color: #888;
+}

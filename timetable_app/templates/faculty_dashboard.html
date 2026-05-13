@@ -1,0 +1,194 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Faculty Dashboard | TTGS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{% static 'css/faculty_dashboard.css' %}" />
+  </head>
+
+  <body>
+    <div class="layout">
+      <!-- SIDEBAR — always rendered -->
+      <div class="sidebar" id="sidebar">
+        <div class="logo-box">
+          <img src="{% static 'images/logo.png' %}" alt="Logo" />
+          <h2>TTGS Faculty</h2>
+        </div>
+
+        {% if faculty %}
+        <div class="menu">
+          <a href="#" class="menu-link active" data-target="today-section"
+            >Today</a
+          >
+          <a href="#" class="menu-link" data-target="week-section"
+            >Week Schedule</a
+          >
+          <a href="#" class="menu-link" data-target="subjects-section"
+            >Subjects</a
+          >
+        </div>
+
+        <!-- MOBILE ONLY -->
+        <div class="bottom-links">
+          <a href="{% url 'faculty_dashboard' %}"> 🏠︎ Home </a>
+          <a href="{% url 'logout' %}"> ⏻ Logout </a>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- OVERLAY -->
+      <div class="overlay" id="overlay"></div>
+
+      <!-- MAIN -->
+      <div class="main">
+        <!-- TOPBAR -->
+        <div class="topbar">
+          <button class="hamburger" id="hamburgerBtn">☰</button>
+          <h2>Faculty Dashboard</h2>
+          <div class="topbar-spacer"></div>
+
+          {% if faculty %}
+          <div class="topbar-right">
+            <a href="{% url 'faculty_dashboard' %}" class="tb-btn tb-home"
+              > 🏠︎ Home </a
+            >
+            <a href="{% url 'logout' %}" class="tb-btn tb-logout"> ⏻ Logout </a>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- CONTENT -->
+        <div class="content">
+          <!-- SELECT FACULTY -->
+          {% if not faculty %}
+          <div class="card search-card">
+            <h2>Select Faculty</h2>
+            <form method="GET">
+              <select name="faculty" required>
+                <option value="" disabled selected>-- Select Faculty --</option>
+                {% for fac in all_faculties %}
+                <option value="{{ fac.id }}">{{ fac.name }}</option>
+                {% endfor %}
+              </select>
+              <button type="submit">Open Dashboard</button>
+            </form>
+          </div>
+          {% endif %} {% if faculty %}
+
+          <div class="faculty-name-box">
+            <span style="font-size: 22px">👨‍🏫</span>
+            <h2>{{ faculty.name }}</h2>
+          </div>
+
+          <!-- TODAY SECTION -->
+          <div class="page-section active" id="today-section">
+            <div class="card">
+              <h3>📅 Today's Classes</h3>
+              <div class="schedule-list">
+                {% for item in today_timetable %}
+                <div class="schedule-card">
+                  <div class="sc-bar"></div>
+                  <div class="sc-body">
+                    <div class="sc-subject">{{ item.subject.name }}</div>
+                    <div class="sc-meta">
+                      <span class="chip chip-day"
+                        >📆 {{ item.timeslot.day }}</span
+                      >
+                      <span class="chip chip-time"
+                        >🕐 {{ item.start }} – {{ item.end }}</span
+                      >
+                      <span class="chip chip-sem">📖 {{ item.semester }}</span>
+                      <span class="chip chip-room"
+                        >🚪Room No. : {{ item.classroom }}</span
+                      >
+                    </div>
+                  </div>
+                </div>
+                {% empty %}
+                <div class="empty-state">No class scheduled today.</div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+
+          <!-- WEEK SECTION -->
+          <!-- NOTE: week_timetable must be sorted by day then time in views.py
+               using DAY_ORDER sort (see views.py below) so regroup works correctly -->
+          <div class="page-section" id="week-section">
+            <div class="card">
+              <h3>🗓️ Weekly Schedule</h3>
+              <div class="schedule-list">
+                {% regroup week_timetable by timeslot.day as grouped_schedule %}
+                {% for day in grouped_schedule %}
+                <div class="day-group">
+                  <div class="day-group-bar"></div>
+                  <div class="day-label">
+                    <div class="day-badge"></div>
+                    <h2>{{ day.grouper }}</h2>
+                  </div>
+                  <div class="day-items-list">
+                    {% for item in day.list %}
+                    <div class="day-item">
+                      <div class="day-item-num">{{ forloop.counter }}</div>
+                      <div class="day-item-content">
+                        <h3>{{ item.subject.name }}</h3>
+                        <div class="day-item-chips">
+                          <span class="chip chip-time"
+                            >🕐 {{ item.start }} – {{ item.end }}</span
+                          >
+                          <span class="chip chip-sem"
+                            >📖 {{ item.semester }}</span
+                          >
+                          <span class="chip chip-room"
+                            >🚪Room No. :{{ item.classroom }}</span
+                          >
+                        </div>
+                      </div>
+                    </div>
+                    {% endfor %}
+                  </div>
+                </div>
+                {% empty %}
+                <div class="empty-state">No weekly schedule available.</div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+
+          <!-- SUBJECTS SECTION -->
+          <div class="page-section" id="subjects-section">
+            <div class="card">
+              <h3>📚 Assigned Subjects</h3>
+              <div class="subjects-grid">
+                {% for sub in subjects %}
+                <div class="subject-box">
+                  <h3>{{ sub.name }}</h3>
+                  <p><strong>Semester:</strong> {{ sub.semester }}</p>
+                  <!-- <p>
+                    <strong>Lectures / Week:</strong>
+
+                    {% if sub.lectures_per_week %} {{ sub.lectures_per_week }}
+                    {% else %} {{ sub.credits }} {% endif %}
+                  </p> -->
+                </div>
+                {% empty %}
+                <div class="empty-state">No subjects assigned.</div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <script src="{% static 'js/faculty_dashboard.js' %}"></script>
+  </body>
+</html>

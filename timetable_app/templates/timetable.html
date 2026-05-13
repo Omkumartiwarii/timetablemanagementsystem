@@ -1,0 +1,523 @@
+{% load custom_tags %}
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Timetable | TTGS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/templates.css' %}">
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="logo-box">
+    <img src="{% static 'images/logo.png' %}">
+    <h2>TTGS Admin</h2>
+  </div>
+  <div class="menu">
+    <a href="{% url 'add_faculty' %}">Teachers</a>
+    <a href="{% url 'add_timeslot' %}">Timing</a>
+    <a href="{% url 'add_subject' %}">Subjects</a>
+    <a href="{% url 'add_department' %}">Departments</a>
+    <a href="{% url 'add_subject_faculty' %}">Assign Subject</a>
+    <a href="{% url 'add_classroom' %}">Classrooms</a>
+    <a href="{% url 'add_semester' %}">Semesters</a>
+    <a href="{% url 'generate' %}?auto=true">Generate Time Table</a>
+    <a href="{% url 'remove_timetable' %}?auto=true">Remove Time Table</a>
+    <a href="{% url 'timetable' %}" class="active">View Timetable</a>
+  </div>
+  <div class="bottom-links">
+    <hr style="margin: 15px 0; border-color: rgba(255,255,255,0.2)">
+    <a href="{% url 'admin_dashboard' %}">🏠︎ Home</a>
+    <a href="{% url 'logout' %}">⏻ Logout</a>
+  </div>
+</div>
+
+<div class="overlay" id="overlay"></div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <h2>Time Table</h2>
+    </div>
+    <div class="topbar-right">
+      <a href="{% url 'admin_dashboard' %}">🏠︎ Home</a>
+      <a href="{% url 'logout' %}">⏻ Logout</a>
+    </div>
+    <span class="menu-toggle" id="menuBtn" onclick="toggleMenu()">☰</span>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- STATS -->
+    <div class="stats">
+      <div class="card-box">
+        <h4>Departments</h4>
+        <p>{{ departments|length }}</p>
+      </div>
+      <div class="card-box">
+        <h4>Semesters</h4>
+        <p>{{ semesters|length }}</p>
+      </div>
+      <div class="card-box">
+        <h4>Faculty</h4>
+        <p>{{ faculties|length }}</p>
+      </div>
+      <div class="card-box">
+        <h4>Subjects</h4>
+        <p>{{ subjects|length }}</p>
+      </div>
+    </div>
+
+    <!-- CARD: TOGGLE + FILTER FORM -->
+    <div class="card">
+      <h3>View Timetable</h3>
+
+      <div class="view-toggle">
+        <button type="button" class="toggle-btn" id="todayBtn" onclick="showToday()">
+          📌 Today's Timetable
+        </button>
+        <button type="button" class="toggle-btn" id="filterBtn" onclick="showFilter()">
+          📅 View Full Timetable
+        </button>
+      </div>
+
+      <div id="filterFormSection" style="display:none;">
+        <form method="GET" id="filterForm">
+          <input type="hidden" name="section" value="filter">
+
+          <label>Department</label>
+          <select name="department">
+            <option value="all">All Departments</option>
+            {% for dept in departments %}
+            <option value="{{ dept.id }}"
+              {% if dept.id|stringformat:"s" == selected_department %}selected{% endif %}>
+              {{ dept.name }}
+            </option>
+            {% endfor %}
+          </select>
+
+          <label>Semester</label>
+          <select name="semester">
+            <option value="all">All Semesters</option>
+            {% for sem in semesters %}
+            <option value="{{ sem.id }}"
+              {% if sem.id|stringformat:"s" == selected_semester %}selected{% endif %}>
+              {{ sem.department.name }} - Sem {{ sem.semester_number }}
+            </option>
+            {% endfor %}
+          </select>
+
+          <button type="submit" class="btn-apply">Apply Filter ✔</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ===================== TODAY SECTION ===================== -->
+    <div id="todaySection" style="display:none;">
+      <div class="today-wrapper">
+
+        <!-- GOLD BANNER (prev on left, info center, next on right) -->
+        <div class="today-banner">
+
+          <!-- PREV -->
+          <div class="day-nav nav-left">
+            <button class="nav-btn" id="prevBtn" onclick="changeDay(-1)" title="Previous Day">&#8592;</button>
+            <span class="nav-day-label" id="prevDayLabel"></span>
+          </div>
+
+          <!-- CENTER INFO -->
+          <div class="today-banner-day" id="bannerDayLabel">TODAY</div>
+          <div class="today-banner-title" id="bannerDayName">🗓️ Wednesday's Classes</div>
+          <div class="today-banner-badge" id="bannerBadge">Total: 0 Classes</div>
+
+          <!-- NEXT -->
+          <div class="day-nav nav-right">
+            <span class="nav-day-label" id="nextDayLabel"></span>
+            <button class="nav-btn" id="nextBtn" onclick="changeDay(1)" title="Next Day">&#8594;</button>
+          </div>
+
+        </div>
+
+        <!-- DYNAMIC CLASS LIST -->
+        <div class="today-body-area">
+          <div id="todayBody"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- FULL TIMETABLE -->
+    <div id="fullSection" style="display:none;">
+      {% if grouped_data %}
+      <div class="table-card">
+        {% for title, timetable in grouped_data.items %}
+        <h3>{{ title }}</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Day</th>
+              {% for slot in slots %}
+              <th>{{ slot.start_time }} - {{ slot.end_time }}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for day in days %}
+            <tr>
+              <td><b>{{ day }}</b></td>
+              {% for slot in slots %}
+              <td>
+                {% if slot.is_break %}
+                  <div class="subject"><b>BREAK</b></div>
+                {% else %}
+                  {% with time=slot.start_time|time:"H:i" %}
+                  {% with key=day|add:"_"|add:time %}
+                  {% if timetable|get_item:key %}
+                    {% with entry=timetable|get_item:key %}
+                    <div class="subject">{{ entry.subject.name }}</div>
+                    <div class="faculty">
+                      {% for f in entry.faculty.all %}
+                        {{ f.name }}{% if not forloop.last %}, {% endif %}
+                      {% empty %}Not Assigned{% endfor %}
+                    </div>
+                    <div class="room">{{ entry.classroom.room_number }}</div>
+                    {% endwith %}
+                  {% else %}Free{% endif %}
+                  {% endwith %}
+                  {% endwith %}
+                {% endif %}
+              </td>
+              {% endfor %}
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <br>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- Django-injected full week schedule JSON -->
+<script id="allSchedulesData" type="application/json">
+  {{ all_schedules_json|safe }}
+</script>
+
+<script src="{% static 'js/all-js.js' %}"></script>
+
+<script>
+  var allSchedules = JSON.parse(
+    document.getElementById("allSchedulesData").textContent,
+  );
+
+  var serverSection = "{{ request.GET.section|default:'' }}";
+
+  var WEEK = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+
+  var todayName = "{{ today_name }}";
+
+  var todayIndex = WEEK.indexOf(todayName);
+
+  if (todayIndex === -1) {
+    todayIndex = 0;
+  }
+
+  var dayOffset = 0;
+
+  function getMinOffset() {
+    return -todayIndex;
+  }
+
+  function getMaxOffset() {
+    return WEEK.length - 1 - todayIndex;
+  }
+
+  // ========================
+  // ESCAPE HTML
+  // ========================
+
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  // ========================
+  // RENDER TODAY SECTION
+  // ========================
+
+  function renderDay(offset) {
+    var idx = todayIndex + offset;
+
+    var dayName = WEEK[idx];
+
+    var items = allSchedules[dayName] || [];
+
+    var count = items.length;
+
+    var relLabel =
+      offset === 0
+        ? "TODAY"
+        : offset === -1
+          ? "YESTERDAY"
+          : offset === 1
+            ? "TOMORROW"
+            : dayName.toUpperCase();
+
+    document.getElementById("bannerDayLabel").textContent =
+      relLabel;
+
+    document.getElementById("bannerDayName").textContent =
+      "🗓️ " + dayName + "'s Classes";
+
+    document.getElementById("bannerBadge").textContent =
+      "Total: " +
+      count +
+      (count === 1 ? " Class" : " Classes");
+
+    var prevIdx = idx - 1;
+
+    var nextIdx = idx + 1;
+
+    document.getElementById("prevDayLabel").textContent =
+      prevIdx >= 0 ? WEEK[prevIdx] : "";
+
+    document.getElementById("nextDayLabel").textContent =
+      nextIdx <= WEEK.length - 1 ? WEEK[nextIdx] : "";
+
+    document.getElementById("prevBtn").disabled =
+      offset <= getMinOffset();
+
+    document.getElementById("nextBtn").disabled =
+      offset >= getMaxOffset();
+
+    var body = document.getElementById("todayBody");
+
+    if (count === 0) {
+      body.innerHTML =
+        '<div class="no-today anim-fade">' +
+        '<div class="no-today-icon">📭</div>' +
+        "No classes scheduled for " +
+        dayName +
+        "." +
+        "</div>";
+
+      return;
+    }
+
+    var cards = items
+      .map(function (item, i) {
+        return (
+          '<div class="class-card">' +
+          '<div class="card-accent"></div>' +
+          '<div class="card-num">' +
+          '<div class="card-num-circle">' +
+          (i + 1) +
+          "</div>" +
+          "</div>" +
+          '<div class="card-main">' +
+          '<div class="card-subject">' +
+          escHtml(item.subject) +
+          "</div>" +
+          '<div class="card-tags">' +
+          '<span class="ctag ctag-time">' +
+          '<span class="ctag-icon">🕒</span>' +
+          escHtml(item.time) +
+          "</span>" +
+          '<span class="ctag ctag-sem">' +
+          '<span class="ctag-icon">🏫</span>' +
+          escHtml(item.semester) +
+          "</span>" +
+          '<span class="ctag ctag-room">' +
+          '<span class="ctag-icon">🚪</span>' +
+          escHtml(item.room) +
+          "</span>" +
+          '<span class="ctag ctag-faculty">' +
+          '<span class="ctag-icon">👨‍🏫</span>' +
+          escHtml(item.faculty) +
+          "</span>" +
+          "</div>" +
+          "</div>" +
+          "</div>"
+        );
+      })
+      .join("");
+
+    body.innerHTML =
+      '<div class="anim-fade">' + cards + "</div>";
+  }
+
+  // ========================
+  // DAY NAVIGATION
+  // ========================
+
+  function changeDay(dir) {
+    var newOff = dayOffset + dir;
+
+    if (
+      newOff < getMinOffset() ||
+      newOff > getMaxOffset()
+    ) {
+      return;
+    }
+
+    dayOffset = newOff;
+
+    renderDay(dayOffset);
+  }
+
+  // ========================
+  // SECTION TOGGLE
+  // ========================
+
+  function showToday() {
+    dayOffset = 0;
+
+    renderDay(0);
+
+    document.getElementById("todaySection").style.display =
+      "block";
+
+    document.getElementById(
+      "filterFormSection",
+    ).style.display = "none";
+
+    document.getElementById("fullSection").style.display =
+      "none";
+
+    document
+      .getElementById("todayBtn")
+      .classList.add("active-btn");
+
+    document
+      .getElementById("filterBtn")
+      .classList.remove("active-btn");
+  }
+
+  function showFilter() {
+    document.getElementById(
+      "filterFormSection",
+    ).style.display = "block";
+
+    document.getElementById("todaySection").style.display =
+      "none";
+
+    var hasTable = document.querySelector(
+      "#fullSection .table-card",
+    );
+
+    document.getElementById("fullSection").style.display =
+      hasTable ? "block" : "none";
+
+    document
+      .getElementById("filterBtn")
+      .classList.add("active-btn");
+
+    document
+      .getElementById("todayBtn")
+      .classList.remove("active-btn");
+  }
+
+  // ========================
+  // DEPARTMENT -> SEMESTER FILTER
+  // ========================
+
+  const deptSelect = document.querySelector(
+    'select[name="department"]',
+  );
+
+  const semSelect = document.querySelector(
+    'select[name="semester"]',
+  );
+
+  const allSemesterOptions = Array.from(
+    semSelect.options,
+  );
+
+  function filterSemesters() {
+    const selectedDept = deptSelect.value;
+
+    semSelect.innerHTML = "";
+
+    allSemesterOptions.forEach((option) => {
+      if (option.value === "all") {
+        semSelect.appendChild(option.cloneNode(true));
+        return;
+      }
+
+      const text = option.textContent;
+
+      if (
+        selectedDept === "all" ||
+        text.includes(
+          deptSelect.options[deptSelect.selectedIndex].text,
+        )
+      ) {
+        semSelect.appendChild(option.cloneNode(true));
+      }
+    });
+  }
+
+  deptSelect.addEventListener(
+    "change",
+    filterSemesters,
+  );
+
+  // ========================
+  // PAGE LOAD
+  // ========================
+
+  window.addEventListener("DOMContentLoaded", function () {
+    filterSemesters();
+
+    // BY DEFAULT NOTHING SHOW
+    document.getElementById(
+      "todaySection",
+    ).style.display = "none";
+
+    document.getElementById(
+      "filterFormSection",
+    ).style.display = "none";
+
+    document.getElementById(
+      "fullSection",
+    ).style.display = "none";
+
+    document
+      .getElementById("todayBtn")
+      .classList.remove("active-btn");
+
+    document
+      .getElementById("filterBtn")
+      .classList.remove("active-btn");
+
+    // ONLY SHOW WHEN FILTER APPLIED
+    if (serverSection === "filter") {
+      showFilter();
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,364 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <title>Remove Timetable</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="{% static 'css/templates.css' %}" />
+  </head>
+
+  <body>
+    <!-- SUCCESS MESSAGE -->
+
+    {% if messages %} {% for message in messages %}
+    <div class="success-toast" id="toast">{{ message }}</div>
+    {% endfor %} {% endif %}
+
+    <!-- LOADER -->
+
+    <div class="loader-overlay" id="loader">
+      <div class="loader-box">
+        <div class="loader-spinner"></div>
+
+        <h2>
+          Removing Timetable
+          <span class="loader-dots"></span>
+        </h2>
+
+        <p>
+          Please wait while the system removes timetable data from the database.
+        </p>
+      </div>
+    </div>
+
+    <!-- CONFIRM MODAL -->
+
+    <div class="confirm-modal" id="confirmModal">
+      <div class="confirm-box">
+        <h2>Delete Timetable?</h2>
+
+        <p>Are you sure you want to remove timetable data from the database?</p>
+
+        <div class="confirm-actions">
+          <button type="button" class="cancel-btn" id="cancelBtn">
+            Cancel
+          </button>
+
+          <button type="button" class="delete-btn" id="confirmBtn">
+            Yes, Remove
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+
+    <div class="sidebar">
+      <div class="logo-box">
+        <img src="{% static 'images/logo.png' %}" />
+
+        <h2>TTGS Admin</h2>
+      </div>
+
+      <div class="menu">
+        <a href="{% url 'add_faculty' %}">Teachers</a>
+
+        <a href="{% url 'add_timeslot' %}">Timing</a>
+
+        <a href="{% url 'add_subject' %}">Subjects</a>
+
+        <a href="{% url 'add_department' %}">Departments</a>
+
+        <a href="{% url 'add_subject_faculty' %}">Assign Subject</a>
+
+        <a href="{% url 'add_classroom' %}">Classrooms</a>
+
+        <a href="{% url 'add_semester' %}">Semesters</a>
+
+        <a href="{% url 'generate' %}">Generate Time Table</a>
+
+        <a href="{% url 'remove_timetable' %}" class="active">
+          Remove Time Table
+        </a>
+
+        <a href="{% url 'timetable' %}">View Timetable</a>
+      </div>
+
+      <div class="bottom-links">
+        <hr style="margin: 15px 0; border-color: rgba(255, 255, 255, 0.2)" />
+
+        <a href="{% url 'admin_dashboard' %}">🏠︎ Home</a>
+
+        <a href="{% url 'logout' %}">⏻ Logout</a>
+      </div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+
+    <!-- MAIN -->
+
+    <div class="main">
+      <div class="topbar">
+        <div class="topbar-left">
+          <h2>Remove Timetable</h2>
+        </div>
+
+        <div class="topbar-right">
+          <a href="{% url 'admin_dashboard' %}">🏠︎ Home</a>
+
+          <a href="{% url 'logout' %}">⏻ Logout</a>
+        </div>
+
+        <span class="menu-toggle" id="menuBtn" onclick="toggleMenu()">
+          ☰
+        </span>
+      </div>
+
+      <div class="content">
+        <!-- ================= STATS ================= -->
+        <div class="stats">
+          <div class="card-box">
+            <h4>Departments</h4>
+            <p>{{ departments|length }}</p>
+          </div>
+
+          <div class="card-box">
+            <h4>Semesters</h4>
+            <p>{{ semesters|length }}</p>
+          </div>
+
+          <div class="card-box">
+            <h4>Faculty</h4>
+            <p>{{ faculties|length }}</p>
+          </div>
+
+          <div class="card-box">
+            <h4>Classrooms</h4>
+            <p>{{ classrooms|length }}</p>
+          </div>
+        </div>
+
+        
+        <div class="card">
+          <h3>Remove Timetable</h3>
+
+          <form method="POST" id="removeForm">
+            {% csrf_token %}
+
+            <!-- REMOVE TYPE -->
+
+            <label>Remove Type</label>
+
+            <select name="remove_type" id="removeType">
+              <option value="all">Remove All Timetable</option>
+
+              <option value="department">Remove Department Timetable</option>
+
+              <option value="semester">Remove Semester Timetable</option>
+            </select>
+
+            <!-- DEPARTMENT -->
+
+            <label id="departmentLabel" style="display: none">
+              Select Department
+            </label>
+
+            <select
+              name="department"
+              id="departmentSelect"
+              style="display: none"
+            >
+              <option value="">---------</option>
+
+              {% for dept in departments %}
+              <option value="{{ dept.id }}">{{ dept.name }}</option>
+              {% endfor %}
+            </select>
+
+            <!-- SEMESTER -->
+
+            <label id="semesterLabel" style="display: none">
+              Select Semester
+            </label>
+
+            <select name="semester" id="semesterSelect" style="display: none">
+              <option value="">---------</option>
+
+              {% for sem in semesters %}
+              <option
+                value="{{ sem.id }}"
+                data-department="{{ sem.department.name }}"
+              >
+                {{ sem.department.name }} - Sem {{ sem.semester_number }}
+              </option>
+              {% endfor %}
+            </select>
+
+            <button type="submit" class="btn danger-btn">
+              Remove Timetable
+            </button>
+          </form>
+
+          <form method="get" action="{% url 'timetable' %}">
+            <button type="submit" class="btn">View Timetable</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script src="{% static 'js/all-js.js' %}"></script>
+
+    <script>
+      const form = document.getElementById("removeForm");
+
+      const loader = document.getElementById("loader");
+
+      const confirmModal = document.getElementById("confirmModal");
+
+      const confirmBtn = document.getElementById("confirmBtn");
+
+      const cancelBtn = document.getElementById("cancelBtn");
+
+      const removeType = document.getElementById("removeType");
+
+      const departmentSelect = document.getElementById("departmentSelect");
+
+      const semesterSelect = document.getElementById("semesterSelect");
+
+      const departmentLabel = document.getElementById("departmentLabel");
+
+      const semesterLabel = document.getElementById("semesterLabel");
+
+      let formSubmitted = false;
+
+      // ===== SHOW / HIDE FIELDS =====
+
+      function toggleFields() {
+        const type = removeType.value;
+
+        if (type === "all") {
+          departmentLabel.style.display = "none";
+          departmentSelect.style.display = "none";
+
+          semesterLabel.style.display = "none";
+          semesterSelect.style.display = "none";
+        } else if (type === "department") {
+          departmentLabel.style.display = "block";
+          departmentSelect.style.display = "block";
+
+          semesterLabel.style.display = "none";
+          semesterSelect.style.display = "none";
+        } else if (type === "semester") {
+          departmentLabel.style.display = "block";
+          departmentSelect.style.display = "block";
+
+          semesterLabel.style.display = "block";
+          semesterSelect.style.display = "block";
+        }
+      }
+
+      removeType.addEventListener("change", toggleFields);
+
+      toggleFields();
+
+      // ===== FILTER SEMESTERS =====
+
+      const allSemesterOptions = Array.from(
+        semesterSelect.querySelectorAll("option"),
+      );
+
+      function filterSemesters() {
+        const selectedDept =
+          departmentSelect.options[departmentSelect.selectedIndex]?.text;
+
+        semesterSelect.innerHTML = '<option value="">---------</option>';
+
+        allSemesterOptions.forEach((option) => {
+          if (!option.value) return;
+
+          if (option.dataset.department === selectedDept) {
+            semesterSelect.appendChild(option.cloneNode(true));
+          }
+        });
+      }
+
+      departmentSelect.addEventListener("change", filterSemesters);
+
+      // ===== OPEN MODAL =====
+
+      form.addEventListener("submit", function (e) {
+        const type = removeType.value;
+
+        if (type === "department" && !departmentSelect.value) {
+          alert("Please select a department");
+
+          e.preventDefault();
+
+          return;
+        }
+
+        if (type === "semester") {
+          if (!departmentSelect.value) {
+            alert("Please select a department");
+
+            e.preventDefault();
+
+            return;
+          }
+
+          if (!semesterSelect.value) {
+            alert("Please select a semester");
+
+            e.preventDefault();
+
+            return;
+          }
+        }
+
+        if (!formSubmitted) {
+          e.preventDefault();
+
+          confirmModal.classList.add("show");
+        }
+      });
+
+      // ===== CANCEL =====
+
+      cancelBtn.addEventListener("click", function () {
+        confirmModal.classList.remove("show");
+      });
+
+      // ===== CONFIRM REMOVE =====
+
+      confirmBtn.addEventListener("click", function () {
+        confirmModal.classList.remove("show");
+
+        loader.classList.add("show");
+
+        formSubmitted = true;
+
+        form.submit();
+      });
+
+      // ===== AUTO HIDE TOAST =====
+
+      const toast = document.getElementById("toast");
+
+      if (toast) {
+        setTimeout(() => {
+          toast.style.display = "none";
+        }, 3000);
+      }
+    </script>
+  </body>
+</html>

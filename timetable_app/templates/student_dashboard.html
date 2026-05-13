@@ -1,0 +1,166 @@
+{% load custom_tags %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Dashboard | TTGS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+<link rel="stylesheet" href="{% static 'css/student_dashboard.css' %}">
+</head>
+<body>
+
+<!-- ═══════════════ FIXED NAVBAR ═══════════════ -->
+<nav class="navbar">
+  <div class="nav-brand">
+    <img src="{% static 'images/logo.png' %}" alt="TTGS Logo" class="nav-logo"
+         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+    <div class="nav-logo-badge" style="display:none;"><span>TT<br>GS</span></div>
+    <div class="nav-title-group">
+      <span class="nav-title">TTGS</span>
+      <span class="nav-sub">Academic Timetable System</span>
+    </div>
+  </div>
+
+  <div class="nav-right">
+    <button class="btn btn-download" id="downloadBtn" onclick="downloadPDF()">
+      <i class="fa-solid fa-download"></i>
+      <span class="btn-label">Download PDF</span>
+    </button>
+    <a href="{% url 'logout' %}" class="btn btn-logout">
+      <i class="fa-solid fa-arrow-right-from-bracket"></i>
+      <span class="btn-label">Logout</span>
+    </a>
+  </div>
+</nav>
+
+<!-- ═══════════════ MAIN ═══════════════ -->
+<main class="main">
+
+  <div class="page-head">
+    <div>
+      <div class="page-eyebrow">Student Portal</div>
+      <div class="page-heading">Class <em>Timetable</em></div>
+      <div class="page-meta">Current Academic Session</div>
+    </div>
+  </div>
+
+  <form method="GET" id="filterForm">
+    <div class="filter-card">
+      <span class="filter-label">Filter By</span>
+      <div class="filter-divider"></div>
+
+      <select name="department" class="filter-select" id="deptSelect"
+        onchange="document.getElementsByName('semester')[0].value='all'; this.form.submit();">
+        <option value="all">All Departments</option>
+        {% for dept in departments %}
+        <option value="{{ dept.id }}"
+          {% if dept.id|stringformat:"s" == selected_department %}selected{% endif %}>
+          {{ dept.name }}
+        </option>
+        {% endfor %}
+      </select>
+
+      <select name="semester" class="filter-select" id="semSelect">
+        <option value="all">All Semesters</option>
+        {% for sem in semesters %}
+        <option value="{{ sem.id }}"
+          {% if sem.id|stringformat:"s" == selected_semester %}selected{% endif %}>
+          {{ sem.department.name }} — Sem {{ sem.semester_number }}
+        </option>
+        {% endfor %}
+      </select>
+
+      <button type="submit" class="btn-apply">
+        <i class="fa-solid fa-filter"></i>
+        Apply Filter
+      </button>
+    </div>
+  </form>
+
+  <div id="timetable">
+
+    {% if grouped_data %}
+      {% for title, timetable in grouped_data.items %}
+
+      <div class="tt-card">
+        <div class="tt-card-head">
+          <span class="tt-card-title">{{ title }}</span>
+          <span class="tt-card-badge">Timetable</span>
+        </div>
+
+        <div class="tt-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Day</th>
+                {% regroup slots by start_time as unique_slots %}
+                {% for group in unique_slots %}
+                  <th>{{ group.grouper }} – {{ group.list.0.end_time }}</th>
+                {% endfor %}
+              </tr>
+            </thead>
+            <tbody>
+              {% for day in days %}
+              <tr>
+                <td>
+                  <div class="day-label-cell">
+                    <span class="day-short">{{ day|slice:":3" }}</span>
+                    <span class="day-full">{{ day }}</span>
+                  </div>
+                </td>
+                {% for group in unique_slots %}
+                  {% with time=group.grouper|time:"H:i" %}
+                  {% with key=day|add:"_"|add:time %}
+                  <td>
+                    {% if timetable|get_item:key %}
+                      {% with entry=timetable|get_item:key %}
+                      <div class="cell-busy">
+                        <div class="cell-subject">{{ entry.subject.name }}</div>
+                        <div class="cell-faculty">
+                          {% for f in entry.faculty.all %}
+                            {{ f.name }}{% if not forloop.last %}, {% endif %}
+                          {% empty %}—{% endfor %}
+                        </div>
+                        <div class="cell-room">{{ entry.classroom.room_number }}</div>
+                      </div>
+                      {% endwith %}
+                    {% else %}
+                      <span class="cell-free">— free —</span>
+                    {% endif %}
+                  </td>
+                  {% endwith %}
+                  {% endwith %}
+                {% endfor %}
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {% endfor %}
+
+    {% else %}
+      <div class="empty-state">
+        <span class="empty-icon">📅</span>
+        <div class="empty-text">No timetable found</div>
+        <div class="empty-sub">Select a department and semester above to view schedules</div>
+      </div>
+    {% endif %}
+
+  </div>
+
+  <div class="footer-strip">TTGS · Academic Scheduling Platform · All Rights Reserved</div>
+
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="{% static 'js/student_dashboard.js' %}"></script>
+
+</body>
+</html>
