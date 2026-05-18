@@ -15,6 +15,8 @@
     />
 
     <link rel="stylesheet" href="{% static 'css/templates.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/chatbot.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/footer.css' %}" />
   </head>
 
   <body>
@@ -143,12 +145,11 @@
           </div>
 
           <div class="card-box">
-            <h4>Classrooms</h4>
-            <p>{{ classrooms|length }}</p>
+            <h4>Timetable</h4>
+            <p>{{ timetables|length }}</p>
           </div>
         </div>
 
-        
         <div class="card">
           <h3>Remove Timetable</h3>
 
@@ -216,149 +217,97 @@
       </div>
     </div>
 
-    <script src="{% static 'js/all-js.js' %}"></script>
+    <!-- FOOTER -->
 
-    <script>
-      const form = document.getElementById("removeForm");
+    <footer class="site-footer">
+      <div class="footer-left">
+        © 2026 <strong>TTGS</strong>
+        — Timetable Generation System
+      </div>
 
-      const loader = document.getElementById("loader");
+      <div class="footer-right">
+        <a href="{% url 'teams' %}">Developers</a>
+        |
+        <a href="{% url 'admin_dashboard' %}">Home</a>
+        |
+        <a href="{% url 'logout' %}"> Logout </a>
+      </div>
+    </footer>
 
-      const confirmModal = document.getElementById("confirmModal");
+    <!-- ─────────────────────────────
+   FLOATING CHATBOT
+───────────────────────────── -->
 
-      const confirmBtn = document.getElementById("confirmBtn");
+    <div class="chatbot-wrapper">
+      <!-- FLOAT BUTTON -->
+      <button
+        class="chat-toggle-btn"
+        id="chatToggleBtn"
+        aria-label="Open chat assistant"
+      >
+        🤖
+      </button>
 
-      const cancelBtn = document.getElementById("cancelBtn");
+      <!-- CHAT WINDOW -->
+      <div
+        class="chat-window"
+        id="chatWindow"
+        role="dialog"
+        aria-label="TTGS Assistant"
+      >
+        <!-- Header -->
+        <div class="cw-header">
+          <div class="cw-avatar">🤖</div>
 
-      const removeType = document.getElementById("removeType");
+          <div class="cw-info">
+            <div class="cw-name">TTGS Assistant</div>
+            <div class="cw-status">
+              <div class="cw-status-dot"></div>
+              Online — always here to help
+            </div>
+          </div>
 
-      const departmentSelect = document.getElementById("departmentSelect");
+          <div class="cw-header-actions">
+            <button class="cw-clear" id="cwClear" title="Clear chat">
+              Clear
+            </button>
+            <button class="cw-close" id="cwClose" aria-label="Close chat">
+              ✕
+            </button>
+          </div>
+        </div>
 
-      const semesterSelect = document.getElementById("semesterSelect");
+        <!-- Messages -->
+        <div class="cw-body" id="cwBody">
+          <div class="welcome-card">
+            <div class="wc-icon">👋</div>
+            <h4>Welcome to TTGS Assistant</h4>
+            <p>
+              Ask me anything about timetable generation, faculty,<br />subjects,
+              classrooms, semesters, and more!
+            </p>
+          </div>
+        </div>
 
-      const departmentLabel = document.getElementById("departmentLabel");
+        <!-- Chatbot Footer -->
+        <div class="cw-footer">
+          <input
+            class="cw-input"
+            id="cwInput"
+            type="text"
+            placeholder="Type your question..."
+            autocomplete="off"
+            maxlength="300"
+          />
+          <button class="cw-send" id="cwSend" aria-label="Send message">
+            ➤
+          </button>
+        </div>
+      </div>
+    </div>
 
-      const semesterLabel = document.getElementById("semesterLabel");
-
-      let formSubmitted = false;
-
-      // ===== SHOW / HIDE FIELDS =====
-
-      function toggleFields() {
-        const type = removeType.value;
-
-        if (type === "all") {
-          departmentLabel.style.display = "none";
-          departmentSelect.style.display = "none";
-
-          semesterLabel.style.display = "none";
-          semesterSelect.style.display = "none";
-        } else if (type === "department") {
-          departmentLabel.style.display = "block";
-          departmentSelect.style.display = "block";
-
-          semesterLabel.style.display = "none";
-          semesterSelect.style.display = "none";
-        } else if (type === "semester") {
-          departmentLabel.style.display = "block";
-          departmentSelect.style.display = "block";
-
-          semesterLabel.style.display = "block";
-          semesterSelect.style.display = "block";
-        }
-      }
-
-      removeType.addEventListener("change", toggleFields);
-
-      toggleFields();
-
-      // ===== FILTER SEMESTERS =====
-
-      const allSemesterOptions = Array.from(
-        semesterSelect.querySelectorAll("option"),
-      );
-
-      function filterSemesters() {
-        const selectedDept =
-          departmentSelect.options[departmentSelect.selectedIndex]?.text;
-
-        semesterSelect.innerHTML = '<option value="">---------</option>';
-
-        allSemesterOptions.forEach((option) => {
-          if (!option.value) return;
-
-          if (option.dataset.department === selectedDept) {
-            semesterSelect.appendChild(option.cloneNode(true));
-          }
-        });
-      }
-
-      departmentSelect.addEventListener("change", filterSemesters);
-
-      // ===== OPEN MODAL =====
-
-      form.addEventListener("submit", function (e) {
-        const type = removeType.value;
-
-        if (type === "department" && !departmentSelect.value) {
-          alert("Please select a department");
-
-          e.preventDefault();
-
-          return;
-        }
-
-        if (type === "semester") {
-          if (!departmentSelect.value) {
-            alert("Please select a department");
-
-            e.preventDefault();
-
-            return;
-          }
-
-          if (!semesterSelect.value) {
-            alert("Please select a semester");
-
-            e.preventDefault();
-
-            return;
-          }
-        }
-
-        if (!formSubmitted) {
-          e.preventDefault();
-
-          confirmModal.classList.add("show");
-        }
-      });
-
-      // ===== CANCEL =====
-
-      cancelBtn.addEventListener("click", function () {
-        confirmModal.classList.remove("show");
-      });
-
-      // ===== CONFIRM REMOVE =====
-
-      confirmBtn.addEventListener("click", function () {
-        confirmModal.classList.remove("show");
-
-        loader.classList.add("show");
-
-        formSubmitted = true;
-
-        form.submit();
-      });
-
-      // ===== AUTO HIDE TOAST =====
-
-      const toast = document.getElementById("toast");
-
-      if (toast) {
-        setTimeout(() => {
-          toast.style.display = "none";
-        }, 3000);
-      }
-    </script>
+    <script src="{% static 'js/toggle.js' %}"></script>
+    <script src="{% static 'js/chatbot.js' %}"></script>
+    <script src="{% static 'js/remove_timetable.js' %}"></script>
   </body>
 </html>

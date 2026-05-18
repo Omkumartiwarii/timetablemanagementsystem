@@ -13,6 +13,8 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="{% static 'css/templates.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/chatbot.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/footer.css' %}" />
   </head>
 
   <body>
@@ -180,6 +182,96 @@
       </div>
     </div>
 
-    <script src="{% static 'js/all-js.js' %}"></script>
+    <!-- ─────────────────────────────
+   FLOATING CHATBOT
+───────────────────────────── -->
+
+    <div class="chatbot-wrapper">
+      <!-- FLOAT BUTTON -->
+      <button
+        class="chat-toggle-btn"
+        id="chatToggleBtn"
+        aria-label="Open chat assistant"
+      >
+        🤖
+      </button>
+
+      <!-- CHAT WINDOW -->
+      <div
+        class="chat-window"
+        id="chatWindow"
+        role="dialog"
+        aria-label="TTGS Assistant"
+      >
+        <!-- Header -->
+        <div class="cw-header">
+          <div class="cw-avatar">🤖</div>
+
+          <div class="cw-info">
+            <div class="cw-name">TTGS Assistant</div>
+            <div class="cw-status">
+              <div class="cw-status-dot"></div>
+              Online — always here to help
+            </div>
+          </div>
+
+          <div class="cw-header-actions">
+            <button class="cw-clear" id="cwClear" title="Clear chat">
+              Clear
+            </button>
+            <button class="cw-close" id="cwClose" aria-label="Close chat">
+              ✕
+            </button>
+          </div>
+        </div>
+
+        <!-- Messages -->
+        <div class="cw-body" id="cwBody">
+          <div class="welcome-card">
+            <div class="wc-icon">👋</div>
+            <h4>Welcome to TTGS Assistant</h4>
+            <p>
+              Ask me anything about timetable generation, faculty,<br />subjects,
+              classrooms, semesters, and more!
+            </p>
+          </div>
+        </div>
+
+        <!-- Chatbot Footer -->
+        <div class="cw-footer">
+          <input
+            class="cw-input"
+            id="cwInput"
+            type="text"
+            placeholder="Type your question..."
+            autocomplete="off"
+            maxlength="300"
+          />
+          <button class="cw-send" id="cwSend" aria-label="Send message">
+            ➤
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+
+    <footer class="site-footer">
+      <div class="footer-left">
+        © 2026 <strong>TTGS</strong>
+        — Timetable Generation System
+      </div>
+
+      <div class="footer-right">
+        <a href="{% url 'teams' %}">Developers</a>
+        |
+        <a href="{% url 'admin_dashboard' %}">Home</a>
+        |
+        <a href="{% url 'logout' %}"> Logout </a>
+      </div>
+    </footer>
+
+    <script src="{% static 'js/toggle.js' %}"></script>
+    <script src="{% static 'js/chatbot.js' %}"></script>
   </body>
 </html>

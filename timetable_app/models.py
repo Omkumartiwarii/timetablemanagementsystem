@@ -10,23 +10,36 @@ class RecentActivity(models.Model):
         ('Department', 'Department'),
         ('Semester', 'Semester'),
         ('Faculty', 'Faculty'),
+        ('Subject', 'Subject'),
         ('Subject Faculty', 'Subject Faculty'),
+        ('Classroom', 'Classroom'),
+        ('Timing', 'Timing'),
+        ('Generate', 'Generate'),
+        ('Remove', 'Remove'),
+        ('Delete', 'Delete'),
+        ('Edit', 'Edit'),
+        ('Add', 'Add'),
     )
 
-    title = models.CharField(max_length=255)
+    title = models.CharField(
+        max_length=255
+    )
 
     action_type = models.CharField(
         max_length=100,
-        choices=ACTION_TYPES
+        choices=ACTION_TYPES,
+        default='Add'
     )
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
 
     class Meta:
         ordering = ['-created_at']
 
     def __str__(self):
-        return self.title
+        return f"{self.action_type} - {self.title}"
 
 
 # =========================

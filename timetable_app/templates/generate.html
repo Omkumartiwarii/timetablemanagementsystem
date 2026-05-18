@@ -13,6 +13,8 @@
     />
 
     <link rel="stylesheet" href="{% static 'css/templates.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/chatbot.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/footer.css' %}" />
   </head>
 
   <body>
@@ -132,7 +134,6 @@
           </div>
         </div>
 
-        
         <div class="card">
           <h3>Generate Timetable</h3>
 
@@ -214,102 +215,97 @@
       </div>
     </div>
 
-    <script src="{% static 'js/all-js.js' %}"></script>
+    <!-- FOOTER -->
 
-    <script>
-      // ===== CONDITIONAL FIELDS =====
-      const generateType = document.getElementById("generateType");
+    <footer class="site-footer">
+      <div class="footer-left">
+        © 2026 <strong>TTGS</strong>
+        — Timetable Generation System
+      </div>
 
-      const departmentField = document.getElementById("departmentField");
+      <div class="footer-right">
+        <a href="{% url 'teams' %}">Developers</a>
+        |
+        <a href="{% url 'admin_dashboard' %}">Home</a>
+        |
+        <a href="{% url 'logout' %}"> Logout </a>
+      </div>
+    </footer>
 
-      const semesterField = document.getElementById("semesterField");
+    <!-- ─────────────────────────────
+   FLOATING CHATBOT
+───────────────────────────── -->
 
-      const semesterDepartment = document.getElementById("semesterDepartment");
+    <div class="chatbot-wrapper">
+      <!-- FLOAT BUTTON -->
+      <button
+        class="chat-toggle-btn"
+        id="chatToggleBtn"
+        aria-label="Open chat assistant"
+      >
+        🤖
+      </button>
 
-      const semesterSelect = document.getElementById("semesterSelect");
+      <!-- CHAT WINDOW -->
+      <div
+        class="chat-window"
+        id="chatWindow"
+        role="dialog"
+        aria-label="TTGS Assistant"
+      >
+        <!-- Header -->
+        <div class="cw-header">
+          <div class="cw-avatar">🤖</div>
 
-      function toggleFields() {
-        const value = generateType.value;
+          <div class="cw-info">
+            <div class="cw-name">TTGS Assistant</div>
+            <div class="cw-status">
+              <div class="cw-status-dot"></div>
+              Online — always here to help
+            </div>
+          </div>
 
-        departmentField.style.display =
-          value === "department" ? "block" : "none";
+          <div class="cw-header-actions">
+            <button class="cw-clear" id="cwClear" title="Clear chat">
+              Clear
+            </button>
+            <button class="cw-close" id="cwClose" aria-label="Close chat">
+              ✕
+            </button>
+          </div>
+        </div>
 
-        semesterField.style.display = value === "semester" ? "block" : "none";
-      }
+        <!-- Messages -->
+        <div class="cw-body" id="cwBody">
+          <div class="welcome-card">
+            <div class="wc-icon">👋</div>
+            <h4>Welcome to TTGS Assistant</h4>
+            <p>
+              Ask me anything about timetable generation, faculty,<br />subjects,
+              classrooms, semesters, and more!
+            </p>
+          </div>
+        </div>
 
-      generateType.addEventListener("change", toggleFields);
+        <!-- Chatbot Footer -->
+        <div class="cw-footer">
+          <input
+            class="cw-input"
+            id="cwInput"
+            type="text"
+            placeholder="Type your question..."
+            autocomplete="off"
+            maxlength="300"
+          />
+          <button class="cw-send" id="cwSend" aria-label="Send message">
+            ➤
+          </button>
+        </div>
+      </div>
+    </div>
 
-      toggleFields();
-
-      // ===== FILTER SEMESTER BY DEPARTMENT =====
-      semesterDepartment.addEventListener("change", function () {
-        const selectedDept = this.value;
-
-        const options = semesterSelect.querySelectorAll("option");
-
-        semesterSelect.value = "";
-
-        options.forEach((option) => {
-          if (!option.dataset.department) {
-            option.style.display = "block";
-            return;
-          }
-
-          if (option.dataset.department === selectedDept) {
-            option.style.display = "block";
-          } else {
-            option.style.display = "none";
-          }
-        });
-      });
-
-      // ===== FORM SUBMIT =====
-      document
-        .getElementById("generateForm")
-        .addEventListener("submit", function (e) {
-          const type = generateType.value;
-
-          const deptSelect = document.querySelector(
-            'select[name="department"]',
-          );
-
-          const semSelect = document.querySelector('select[name="semester"]');
-
-          if (type === "department" && !deptSelect.value) {
-            alert("Please select a department");
-
-            e.preventDefault();
-
-            return;
-          }
-
-          if (type === "semester") {
-            if (!semesterDepartment.value) {
-              alert("Please select a department");
-
-              e.preventDefault();
-
-              return;
-            }
-
-            if (!semSelect.value) {
-              alert("Please select a semester");
-
-              e.preventDefault();
-
-              return;
-            }
-          }
-
-          document.getElementById("loader").classList.add("show");
-        });
-
-      // ===== AUTO HIDE SUCCESS TOAST =====
-      document.querySelectorAll(".toast-success").forEach(function (toast) {
-        setTimeout(function () {
-          toast.remove();
-        }, 4000);
-      });
-    </script>
+    <script src="{% static 'js/toggle.js' %}"></script>
+    <script src="{% static 'js/chatbot.js' %}"></script>
+    <script src="{% static 'js/generate.js' %}"></script>
   </body>
 </html>

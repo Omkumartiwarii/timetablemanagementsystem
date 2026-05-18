@@ -1,4 +1,4 @@
-from django.urls import path,include
+from django.urls import path, include
 from . import views
 
 urlpatterns = [
@@ -22,7 +22,7 @@ urlpatterns = [
     # TIMETABLE
     # =========================
     path('timetable/', views.timetable_view, name='timetable'),
-    #path('download-pdf/', views.download_pdf, name='download_pdf'),
+    # That duplicate was overriding timetable_view and breaking Add/Edit/Delete
 
     # =========================
     # ADD DATA (ADMIN)
@@ -34,9 +34,10 @@ urlpatterns = [
     path('assign-subject/', views.add_subject_faculty, name='add_subject_faculty'),
     path('add-classroom/', views.add_classroom, name='add_classroom'),
     path('add-timeslot/', views.add_timeslot, name='add_timeslot'),
-    path('timetable/', views.timetable, name='timetable'),
+    path('generate/', views.generate_view, name='generate'),
+    path('teams/', views.teams_page, name='teams'),
     
-    #Delete Faculty
+    # Delete
     path('delete-faculty/<int:id>/', views.delete_faculty, name='delete_faculty'),
     path('delete-classroom/<int:id>/', views.delete_classroom, name='delete_classroom'),
     path('delete-department/<int:id>/', views.delete_department, name='delete_department'),
@@ -46,6 +47,18 @@ urlpatterns = [
     path('delete-timeslot/<int:id>/', views.delete_timeslot, name='delete_timeslot'),
     path('remove-timetable/', views.remove_timetable, name='remove_timetable'),
     
-    #Clear Recent Actions
+    # Clear Recent Actions
     path('clear-recent-activities/', views.clear_recent_activities, name='clear_recent_activities'),
+    
+    # ✅ Add/Edit/Delete timetable entries (AJAX)
+    path('timetable/get/<int:id>/', views.get_timetable_entry, name='get_timetable_entry'),
+    path('timetable/save/', views.save_timetable_entry, name='save_timetable_entry'),
+    path('timetable/delete/<int:id>/', views.delete_timetable_entry, name='delete_timetable_entry'),
+    
+    #ChatBot
+    path(
+    'ttgs-ai-chat/',
+    views.ttgs_ai_chat,
+    name='ttgs_ai_chat'
+),
 ]

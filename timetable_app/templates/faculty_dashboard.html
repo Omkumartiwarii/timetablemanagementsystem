@@ -11,6 +11,8 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="{% static 'css/faculty_dashboard.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/chatbot.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/footer.css' %}" />
   </head>
 
   <body>
@@ -57,7 +59,7 @@
           {% if faculty %}
           <div class="topbar-right">
             <a href="{% url 'faculty_dashboard' %}" class="tb-btn tb-home"
-              > 🏠︎ Home </a
+              >🏠︎ Home</a
             >
             <a href="{% url 'logout' %}" class="tb-btn tb-logout"> ⏻ Logout </a>
           </div>
@@ -189,6 +191,23 @@
         </div>
       </div>
     </div>
+    <!-- FOOTER -->
+
+    <footer class="site-footer">
+      <div class="footer-left">
+        © 2026 <strong>TTGS</strong>
+        — Timetable Generation System
+      </div>
+
+      <div class="footer-right">
+        <a href="{% url 'teams' %}"> Developers </a>
+        |
+        <a href="{% url 'faculty_dashboard' %}"> Home </a>
+        |
+        <a href="{% url 'logout' %}"> Logout </a>
+      </div>
+    </footer>
+
     <script src="{% static 'js/faculty_dashboard.js' %}"></script>
   </body>
 </html>

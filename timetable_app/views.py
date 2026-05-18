@@ -1,8 +1,3 @@
-# views.py — Cleaned & Fixed
-# =====================================================
-# All duplicate imports removed, logic organized
-# =====================================================
-
 import io
 from multiprocessing import context
 from django.shortcuts import render, redirect, get_object_or_404
@@ -253,7 +248,13 @@ def clear_recent_activities(request):
 
     return redirect('admin_dashboard')
 
-
+# =========================
+# CHATBOT
+# =========================
+def ttgs_ai_chat(request):
+    return render(request, "admin_dashboard.html", {
+        'ttgs_ai_chat': True
+    })
 
 # =========================
 # FACULTY DASHBOARD
@@ -397,11 +398,13 @@ from .algorithms import (
 
 @login_required
 def generate_view(request):
-    if not request.user.is_staff:
+    if not (request.user.is_staff or request.user.is_superuser):
         return redirect('student_dashboard')
 
     departments = Department.objects.all()
     semesters = Semester.objects.all().order_by('department', 'semester_number')
+    faculties = Faculty.objects.all()
+    classrooms = Classroom.objects.all()
 
     if request.method == "POST":
         generate_type = request.POST.get('generate_type')
@@ -412,6 +415,12 @@ def generate_view(request):
             if generate_type == "all":
                 Timetable.objects.all().delete()
                 generate_all_timetables(semesters)
+                # RECENT ACTIVITY
+
+                RecentActivity.objects.create(
+                    title="Generated all timetables successfully",
+                    action_type='Generate'
+                )
                 messages.success(request, "All timetables generated successfully.")
 
             elif generate_type == "department":
@@ -425,6 +434,12 @@ def generate_view(request):
                 for sem in department_semesters:
                     pref = preferred_map.get(sem.id, {})
                     generate_timetable(sem,pref,theory_rooms)
+                # RECENT ACTIVITY
+
+                RecentActivity.objects.create(
+                    title=f"Generated timetable for {department.name} department",
+                    action_type='Generate'
+                )
                 messages.success(request, f"{department.name} timetable regenerated.")
 
             elif generate_type == "semester":
@@ -439,6 +454,12 @@ def generate_view(request):
                 )
                 pref = preferred_map.get(semester.id, {})
                 generate_timetable(semester,pref,theory_rooms)
+                # RECENT ACTIVITY
+
+                RecentActivity.objects.create(
+                    title=f"Generated timetable for {semester}",
+                    action_type='Generate'
+                )
                 messages.success(request, f"{semester} timetable regenerated.")
 
         except Exception as e:
@@ -447,6 +468,8 @@ def generate_view(request):
     return render(request, 'generate.html', {
         'departments': departments,
         'semesters': semesters,
+        'faculties': faculties,
+        'classrooms': classrooms,
     })
     
     
@@ -467,6 +490,9 @@ from .models import (
 def remove_timetable(request):
 
     departments = Department.objects.all()
+    faculties = Faculty.objects.all()
+    classrooms = Classroom.objects.all()
+    timeTable = Timetable.objects.all()
 
     semesters = Semester.objects.all().order_by(
         'department',
@@ -550,6 +576,9 @@ def remove_timetable(request):
     context = {
         'departments': departments,
         'semesters': semesters,
+        'faculties': faculties,
+        'classrooms': classrooms,
+        'timetables': timeTable,
     }
 
     return render(
@@ -579,6 +608,10 @@ from .models import (
 # =========================
 # VIEW TIMETABLE (Admin)
 # =========================
+from django.http import JsonResponse
+import json
+
+
 @login_required
 def timetable_view(request):
 
@@ -629,6 +662,13 @@ def timetable_view(request):
     # =========================
     # GROUP TIMETABLE DATA
     # =========================
+    # grouped_data structure:
+    # {
+    #   "Dept - Semester X": {
+    #       "sem_id": 3,
+    #       "table": { "Monday_09:00": <Timetable entry>, ... }
+    #   }
+    # }
     grouped_data = {}
 
     for entry in data:
@@ -639,17 +679,20 @@ def timetable_view(request):
         )
 
         if key not in grouped_data:
-            grouped_data[key] = {}
+            grouped_data[key] = {
+                "sem_id": entry.semester.id,
+                "table": {}
+            }
 
         slot_key = (
             f"{entry.timeslot.day}_"
             f"{entry.timeslot.start_time.strftime('%H:%M')}"
         )
 
-        grouped_data[key][slot_key] = entry
+        grouped_data[key]["table"][slot_key] = entry
 
     # =========================
-    # DAYS & SLOTS
+    # DAYS
     # =========================
     days = [
         "Monday",
@@ -660,11 +703,18 @@ def timetable_view(request):
         "Saturday"
     ]
 
-    slots = TimeSlot.objects.values(
-        'start_time',
-        'end_time',
-        'is_break'
-    ).distinct().order_by('start_time')
+    # =========================
+    # SLOTS — DEDUPLICATED BY START TIME
+    # =========================
+    all_slots = TimeSlot.objects.order_by('start_time')
+    seen_times = set()
+    slots = []
+
+    for slot in all_slots:
+        time_key = slot.start_time.strftime('%H:%M')
+        if time_key not in seen_times:
+            seen_times.add(time_key)
+            slots.append(slot)
 
     # =========================
     # TODAY NAME
@@ -750,6 +800,10 @@ def timetable_view(request):
         'faculties': Faculty.objects.all(),
         'subjects': Subject.objects.all(),
 
+        # MODAL DATA
+        'rooms': Classroom.objects.all(),
+        'all_faculties': Faculty.objects.all(),
+
         # TABLE
         'days': days,
         'slots': slots,
@@ -763,6 +817,134 @@ def timetable_view(request):
 
         # JSON DATA
         'all_schedules_json': json.dumps(all_schedules),
+    })
+
+
+@login_required
+def get_timetable_entry(request, id):
+
+    entry = Timetable.objects.get(id=id)
+
+    return JsonResponse({
+
+        "id": entry.id,
+
+        "subject": entry.subject.id,
+
+        "faculty": entry.faculty.first().id
+        if entry.faculty.exists() else "",
+
+        "room": entry.classroom.id,
+
+        "day": entry.timeslot.day,
+
+        "slot": entry.timeslot.start_time.strftime('%H:%M'),
+
+        # ✅ FIX: return semester so edit modal can send it back
+        "semester": entry.semester.id,
+    })
+
+
+@login_required
+def delete_timetable_entry(request, id):
+
+    entry = Timetable.objects.get(id=id)
+
+    subject_name = entry.subject.name
+
+    semester_name = (
+        f"{entry.semester.department.name} "
+        f"Sem {entry.semester.semester_number}"
+    )
+
+    entry.delete()
+
+    # RECENT ACTIVITY
+    RecentActivity.objects.create(
+        title=f"Deleted {subject_name} timetable from {semester_name}",
+        action_type="Delete"
+    )
+
+    return JsonResponse({
+        "message": "Deleted Successfully"
+    })
+
+
+@login_required
+def save_timetable_entry(request):
+
+    data = json.loads(request.body)
+
+    entry_id = data.get("id")
+
+    day = data.get("day")
+
+    slot_time = data.get("slot")
+
+    semester_id = data.get("semester")  # ✅ FIX: receive semester from frontend
+
+    timeslot = TimeSlot.objects.get(
+        day=day,
+        start_time=slot_time
+    )
+
+    # EDIT EXISTING
+    is_edit = False
+    if entry_id:
+
+        entry = Timetable.objects.get(id=entry_id)
+        is_edit = True
+
+    # CREATE NEW
+    else:
+
+        entry = Timetable()
+
+    # ✅ FIX: always update timeslot (was skipped on edit)
+    entry.timeslot = timeslot
+
+    # SAVE DATA
+    entry.subject_id = data.get("subject")
+
+    entry.classroom_id = data.get("room")
+
+    # ✅ FIX: set semester (was never set, causing save failure)
+    if semester_id:
+        entry.semester_id = int(semester_id)
+
+    entry.save()
+
+    # MANY TO MANY FACULTY
+    entry.faculty.set([
+        data.get("faculty")
+    ])
+    # =========================
+    # RECENT ACTIVITY
+    # =========================
+    subject_name = entry.subject.name
+
+    semester_name = (
+        f"{entry.semester.department.name} "
+        f"Sem {entry.semester.semester_number}"
+    )
+
+    if is_edit:
+
+        RecentActivity.objects.create(
+            title=f"Edited {subject_name} timetable for {semester_name}",
+            action_type="Edit"
+        )
+
+    else:
+
+        RecentActivity.objects.create(
+            title=f"Added {subject_name} timetable for {semester_name}",
+            action_type="Add"
+            )
+
+
+    return JsonResponse({
+        "message": "Saved Successfully"
     })
 
 
@@ -1313,6 +1495,12 @@ def delete_timeslot(request, id):
         reverse('add_timeslot') + '?view_list=true'
     )
 
+# =========================
+# Teams
+# =========================
+def teams_page(request):
+    return render(request, "teams.html")
+  
     
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
