@@ -1,0 +1,500 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TTGS — Meet the Team</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="{% static 'css/teams.css' %}" />
+  </head>
+  <body>
+    <div>
+      <nav class="navbar">
+        <div class="nav-logo">
+          <a
+            href="#"
+            onclick="
+              window.history.back();
+              return false;
+            "
+          >
+            ← Back
+          </a>
+        </div>
+      </nav>
+    </div>
+
+    <div class="bg-lines" aria-hidden="true">
+      <span></span><span></span><span></span><span></span>
+    </div>
+
+    <div class="page">
+      <!-- HERO -->
+      <header class="hero">
+        <div class="eyebrow">TTGS Project &mdash; B.Tech Final Year</div>
+        <h1 class="hero-title">Meet the <em>Team</em></h1>
+        <p class="hero-sub">Click on any member to view their full profile</p>
+        <div class="hero-deco" aria-hidden="true">05</div>
+      </header>
+
+      <!-- CARDS -->
+      <div class="team-grid" id="grid"></div>
+    </div>
+
+    <!-- OVERLAY -->
+    <div class="overlay" id="overlay">
+      <div class="pcard" role="dialog" aria-modal="true" aria-labelledby="pNm">
+        <div class="pcard-rule"></div>
+        <div class="p-scroll">
+          <div class="p-topbar">
+            <div class="p-meet">Meet the Team</div>
+            <button class="pclose" id="closeBtn" aria-label="Close">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+
+          <div class="p-hero">
+            <div class="p-av-wrap">
+              <div class="p-av" id="pAv"></div>
+              <div class="p-dot" title="Active member"></div>
+            </div>
+            <div class="p-meta">
+              <div class="p-eyebrow" id="pEy"></div>
+              <div class="p-name" id="pNm"></div>
+              <div class="p-role" id="pRl"></div>
+              <div class="p-socs" id="pSoc"></div>
+            </div>
+          </div>
+
+          <div class="p-div"></div>
+
+          <div class="p-body">
+            <p class="p-bio" id="pBio"></p>
+            <div>
+              <div class="p-lbl">Skills &amp; Tools</div>
+              <div class="p-skills" id="pSk"></div>
+            </div>
+            <div>
+              <div class="p-lbl">Details</div>
+              <div class="p-stats" id="pSt"></div>
+            </div>
+          </div>
+
+          <div class="p-foot">
+            <span class="p-foot-txt"
+              >TTGS &mdash; Timetable Generation System</span
+            >
+            <span class="p-badge" id="pBadge"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- FOOTER -->
+
+    <footer class="site-footer">
+      <div class="footer-left">
+        © 2026 <strong>TTGS</strong>
+        — Timetable Generation System
+      </div>
+
+      <div class="footer-right">
+        <a href="mailto:contact@ttgs.com">Contact</a>
+        |
+        <a href="{% url 'teams' %}">Developers</a>
+        <!-- |
+        <a
+          href="#"
+          onclick="
+            window.history.back();
+            return false;
+          "
+          >← Back</a
+        > -->
+        |
+        <a href="{% url 'login' %}"> Login </a>
+      </div>
+    </footer>
+
+    <script>
+      /* ── DATA ── */
+      const members = [
+        {
+          name: "Om Kumar",
+          init: "O",
+          bg: "#0d0d0d",
+          img: "{% static 'images/om.jpeg' %}",
+          eyebrow: "Full Stack Developer",
+          role: "Frontend · Backend + Algorithm",
+          badge: "Core Developer",
+          bio: "The backbone of TTGS. Om architected both frontend and backend — crafting every page from home screen to admin dashboard, engineering the Django server, REST APIs, and core business logic. His full-stack ownership kept the project cohesive and production-ready.",
+          skills: [
+            "Django",
+            "Python",
+            "HTML/CSS",
+            "JavaScript",
+            "REST API",
+            "PostgreSQL",
+            "Git",
+            "Deployment",
+          ],
+          stats: [
+            ["Role", "Full Stack Dev"],
+            ["Domain", "Frontend + Backend"],
+            ["Pages", "12+"],
+            ["Stack", "Django · JS · PostgreSQL"],
+          ],
+          // ← Apna actual URL yahan dalo, "#" hatao
+          socials: [
+            {
+              icon: "fa-brands fa-linkedin-in",
+              label: "LinkedIn",
+              href: "https://www.linkedin.com/in/omkumar00116/",
+            },
+            {
+              icon: "fa-brands fa-github",
+              label: "GitHub",
+              href: "https://github.com/Omkumartiwarii",
+            },
+            {
+              icon: "fa-brands fa-instagram",
+              label: "Instagram",
+              href: "https://www.instagram.com/om_kumar_tiwari_?igsh=NWg4MnF6NGc2end0",
+            },
+            {
+              icon: "fa-brands fa-facebook-f",
+              label: "Facebook",
+              href: "https://www.facebook.com/share/1Awk36hYcN/",
+            },
+            {
+              icon: "fa-solid fa-envelope",
+              label: "Email",
+              href: "mailto:omkumar00116@gmail.com",
+            },
+            {
+              icon: "fa-solid fa-globe",
+              label: "Portfolio",
+              href: "https://omkumartiwarii.github.io/portfolio-website/",
+            },
+          ],
+        },
+        {
+          name: "Manshi Gupta",
+          init: "M",
+          bg: "#160d1f",
+          img: "{% static 'images/manshi.jpeg' %}",
+          eyebrow: "Algorithm Engineer",
+          role: "Algorithm · Backend",
+          badge: "Algorithm Lead",
+          bio: "Manshi tackled the hardest problem in TTGS — making the scheduler actually work. She designed and implemented the genetic algorithm and constraint-satisfaction engine that generates conflict-free timetables in seconds, then integrated it cleanly with Django's data layer.",
+          skills: [
+            "Python",
+            "Genetic Algorithm",
+            "CSP",
+            "Algorithm Design",
+            "Backend Integration",
+            "Data Structures",
+          ],
+          stats: [
+            ["Role", "Algorithm Engineer"],
+            ["Domain", "Scheduling Engine"],
+            ["Method", "Genetic + CSP"],
+            ["Result", "Zero-conflict output"],
+          ],
+          socials: [
+            {
+              icon: "fa-brands fa-linkedin-in",
+              label: "LinkedIn",
+              href: "https://linkedin.com/in/manshi-gupta",
+            },
+            {
+              icon: "fa-brands fa-github",
+              label: "GitHub",
+              href: "https://github.com/manshi-gupta",
+            },
+            {
+              icon: "fa-brands fa-instagram",
+              label: "Instagram",
+              href: "https://instagram.com/manshi.gupta",
+            },
+            {
+              icon: "fa-brands fa-facebook-f",
+              label: "Facebook",
+              href: "https://facebook.com/manshi.gupta",
+            },
+            {
+              icon: "fa-solid fa-envelope",
+              label: "Email",
+              href: "mailto:manshi@example.com",
+            },
+            { icon: "fa-solid fa-globe", label: "Portfolio", href: "#" },
+          ],
+        },
+        {
+          name: "Sweety Kumari",
+          init: "S",
+          bg: "#0a1a10",
+          img: "{% static 'images/sweety.jpg' %}",
+          eyebrow: "Database & Documentation",
+          role: "Database · Docs",
+          badge: "DB Architect",
+          bio: "Sweety designed and maintained the entire PostgreSQL schema — modeling departments, faculty, subjects, rooms, and timeslots with precision. She also authored the complete project documentation, SRS, and technical reports that gave the project its academic backbone.",
+          skills: [
+            "PostgreSQL",
+            "Schema Design",
+            "ER Diagrams",
+            "Django ORM",
+            "SRS Writing",
+            "Technical Docs",
+            "Migrations",
+          ],
+          stats: [
+            ["Role", "DB Architect"],
+            ["Domain", "Database + Docs"],
+            ["Tables", "15+"],
+            ["Deliverables", "SRS · ER · Report"],
+          ],
+          socials: [
+            {
+              icon: "fa-brands fa-linkedin-in",
+              label: "LinkedIn",
+              href: "https://linkedin.com/in/sweety-kumari",
+            },
+            {
+              icon: "fa-brands fa-github",
+              label: "GitHub",
+              href: "https://github.com/sweety-kumari",
+            },
+            {
+              icon: "fa-brands fa-instagram",
+              label: "Instagram",
+              href: "https://instagram.com/sweety.kumari",
+            },
+            {
+              icon: "fa-brands fa-facebook-f",
+              label: "Facebook",
+              href: "https://facebook.com/sweety.kumari",
+            },
+            {
+              icon: "fa-solid fa-envelope",
+              label: "Email",
+              href: "mailto:sweety@example.com",
+            },
+            { icon: "fa-solid fa-globe", label: "Portfolio", href: "#" },
+          ],
+        },
+        {
+          name: "Shresth Shaurya",
+          init: "Sh",
+          bg: "#1a0d0d",
+          img: "{% static 'images/shresth.jpeg' %}",
+          eyebrow: "Technical Writing",
+          role: "Project Report",
+          badge: "Report Author",
+          bio: "Shresth authored the comprehensive final project report — covering system analysis, architecture diagrams, literature review, methodology, test results, and conclusions. His structured writing gave TTGS its academic credibility and ensured everything was formally documented.",
+          skills: [
+            "Technical Writing",
+            "MS Word",
+            "Literature Review",
+            "System Analysis",
+            "Formatting",
+            "Research",
+          ],
+          stats: [
+            ["Role", "Report Author"],
+            ["Domain", "Final Report"],
+            ["Chapters", "10+"],
+            ["Format", "B.E. Thesis Standard"],
+          ],
+          socials: [
+            {
+              icon: "fa-brands fa-linkedin-in",
+              label: "LinkedIn",
+              href: "https://linkedin.com/in/shresth-shaurya",
+            },
+            {
+              icon: "fa-brands fa-github",
+              label: "GitHub",
+              href: "https://github.com/shresth-shaurya",
+            },
+            {
+              icon: "fa-brands fa-instagram",
+              label: "Instagram",
+              href: "https://instagram.com/shresth.shaurya",
+            },
+            {
+              icon: "fa-brands fa-facebook-f",
+              label: "Facebook",
+              href: "https://facebook.com/shresth.shaurya",
+            },
+            {
+              icon: "fa-solid fa-envelope",
+              label: "Email",
+              href: "mailto:shresth@example.com",
+            },
+            { icon: "fa-solid fa-globe", label: "Portfolio", href: "#" },
+          ],
+        },
+        {
+          name: "Akash Kumar",
+          init: "A",
+          bg: "#0a0d1f",
+          img: "{% static 'images/akash.jpg' %}",
+          eyebrow: "Presentation Design",
+          role: "PPT · Visual Slides",
+          badge: "Presenter",
+          bio: "Akash crafted the project's visual story — designing slides that communicated TTGS's architecture, features, and impact to faculty evaluators. His work translated complex technical decisions into clear, compelling visuals that made the final presentation shine.",
+          skills: [
+            "PowerPoint",
+            "Slide Design",
+            "Visual Storytelling",
+            "Canva",
+            "Research",
+            "Communication",
+          ],
+          stats: [
+            ["Role", "Presentation Lead"],
+            ["Domain", "PPT & Slides"],
+            ["Slides", "30+"],
+            ["Audience", "Faculty Panel"],
+          ],
+          socials: [
+            {
+              icon: "fa-brands fa-linkedin-in",
+              label: "LinkedIn",
+              href: "https://linkedin.com/in/akash-kumar",
+            },
+            {
+              icon: "fa-brands fa-github",
+              label: "GitHub",
+              href: "https://github.com/akash-kumar",
+            },
+            {
+              icon: "fa-brands fa-instagram",
+              label: "Instagram",
+              href: "https://instagram.com/akash.kumar",
+            },
+            {
+              icon: "fa-brands fa-facebook-f",
+              label: "Facebook",
+              href: "https://facebook.com/akash.kumar",
+            },
+            {
+              icon: "fa-solid fa-envelope",
+              label: "Email",
+              href: "mailto:akash@example.com",
+            },
+            { icon: "fa-solid fa-globe", label: "Portfolio", href: "#" },
+          ],
+        },
+      ];
+
+      /* ── BUILD CARDS ── */
+      const grid = document.getElementById("grid");
+      members.forEach((m, i) => {
+        const c = document.createElement("div");
+        c.className = "mcard";
+
+        let avHtml = "";
+        if (m.img) {
+          avHtml = `
+      <img class="av-img" src="${m.img}" alt="${m.name}"
+        onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+      <div class="av-init" style="background:${m.bg};display:none">${m.init}</div>`;
+        } else {
+          avHtml = `<div class="av-init" style="background:${m.bg}">${m.init}</div>`;
+        }
+
+        c.innerHTML = `
+    <div class="mcard-bar"></div>
+    <div class="mcard-body">
+      <span class="mcard-idx">0${i + 1}</span>
+      <div class="mcard-av">${avHtml}</div>
+      <div class="mcard-name">${m.name}</div>
+      <div class="mcard-role">${m.role.replace(" · ", "<br>")}</div>
+      <button class="mcard-cta" tabindex="-1" aria-hidden="true">View Profile →</button>
+    </div>`;
+
+        c.addEventListener("click", () => openPopup(i));
+        grid.appendChild(c);
+      });
+
+      /* ── POPUP ── */
+      function openPopup(i) {
+        const m = members[i];
+        const pAv = document.getElementById("pAv");
+        pAv.style.background = m.bg;
+
+        if (m.img) {
+          pAv.innerHTML = `<img src="${m.img}" alt="${m.name}"
+      style="width:100%;height:100%;object-fit:cover;border-radius:50%"
+      onerror="this.outerHTML='<span style=\\'font-family:Playfair Display,Georgia,serif;font-size:36px;font-weight:700;color:#d4a853\\'>${m.init}</span>'" />`;
+        } else {
+          pAv.innerHTML = m.init;
+        }
+
+        document.getElementById("pEy").textContent = m.eyebrow;
+        document.getElementById("pNm").textContent = m.name;
+        document.getElementById("pRl").textContent = m.role;
+        document.getElementById("pBio").textContent = m.bio;
+        document.getElementById("pBadge").textContent = m.badge;
+
+        document.getElementById("pSoc").innerHTML = m.socials
+          .map(
+            (s) =>
+              `<a href="${s.href}" class="p-soc" title="${s.label}" target="_blank" rel="noopener">
+       <i class="${s.icon}"></i></a>`,
+          )
+          .join("");
+
+        document.getElementById("pSk").innerHTML = m.skills
+          .map((s) => `<span class="p-skill">${s}</span>`)
+          .join("");
+
+        document.getElementById("pSt").innerHTML = m.stats
+          .map(
+            ([l, v]) =>
+              `<div class="p-stat">
+       <span class="p-stat-l">${l}</span>
+       <span class="p-stat-v">${v}</span>
+     </div>`,
+          )
+          .join("");
+
+        const ov = document.getElementById("overlay");
+        ov.classList.add("open");
+        document.body.style.overflow = "hidden";
+
+        // re-trigger popup animation each open
+        const pc = ov.querySelector(".pcard");
+        pc.style.animation = "none";
+        requestAnimationFrame(() => {
+          pc.style.animation = "";
+        });
+        setTimeout(() => document.getElementById("closeBtn").focus(), 380);
+      }
+
+      function closePopup() {
+        document.getElementById("overlay").classList.remove("open");
+        document.body.style.overflow = "";
+      }
+
+      document.getElementById("closeBtn").addEventListener("click", closePopup);
+      document.getElementById("overlay").addEventListener("click", (e) => {
+        if (e.target === document.getElementById("overlay")) closePopup();
+      });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closePopup();
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,313 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Generate Timetable</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="{% static 'css/templates.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/chatbot.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/footer.css' %}" />
+  </head>
+
+  <body>
+    <!-- ===== TOASTS ===== -->
+    {% if messages %} {% for message in messages %}
+    <div
+      class="toast {% if message.tags == 'error' %}toast-error{% else %}toast-success{% endif %}"
+      id="toast-{{ forloop.counter }}"
+    >
+      <span class="toast-close" onclick="this.parentElement.remove()">
+        &#x2715;
+      </span>
+
+      {{ message }}
+    </div>
+    {% endfor %} {% endif %}
+
+    <!-- ===== LOADER ===== -->
+    <div class="loader-overlay" id="loader">
+      <div class="loader-box">
+        <div class="loader-spinner"></div>
+
+        <h2>
+          Generating Timetable
+          <span class="loader-dots"></span>
+        </h2>
+
+        <p>
+          Please wait while the system builds an optimised, conflict-free
+          timetable for all departments, semesters, and classrooms.
+        </p>
+      </div>
+    </div>
+
+    <!-- ===== SIDEBAR ===== -->
+    <div class="sidebar">
+      <div class="logo-box">
+        <img src="{% static 'images/logo.png' %}" alt="logo" />
+
+        <h2>TTGS Admin</h2>
+      </div>
+
+      <div class="menu">
+        <a href="{% url 'add_faculty' %}">Teachers</a>
+
+        <a href="{% url 'add_timeslot' %}">Timing</a>
+
+        <a href="{% url 'add_subject' %}">Subjects</a>
+
+        <a href="{% url 'add_department' %}">Departments</a>
+
+        <a href="{% url 'add_subject_faculty' %}">Assign Subject</a>
+
+        <a href="{% url 'add_subject_lab_room' %}">Assign Lab Room</a>
+
+        <a href="{% url 'add_classroom' %}">Classrooms</a>
+
+        <a href="{% url 'add_semester' %}">Semesters</a>
+
+        <a href="{% url 'generate' %}" class="active"> Generate Time Table </a>
+
+        <a href="{% url 'remove_timetable' %}">Remove Timetable</a>
+
+        <a href="{% url 'timetable' %}">View Timetable</a>
+      </div>
+
+      <div class="bottom-links">
+        <hr style="margin: 15px 0; border-color: rgba(255, 255, 255, 0.2)" />
+
+        <a href="{% url 'admin_dashboard' %}">🏠︎ Home</a>
+
+        <a href="{% url 'logout' %}">⏻ Logout</a>
+      </div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+
+    <!-- ===== MAIN ===== -->
+    <div class="main">
+      <!-- TOPBAR -->
+      <div class="topbar">
+        <div class="topbar-left">
+          <h2>Generate Timetable</h2>
+        </div>
+
+        <div class="topbar-right">
+          <a href="{% url 'admin_dashboard' %}">🏠︎ Home</a>
+
+          <a href="{% url 'logout' %}">⏻ Logout</a>
+        </div>
+
+        <span class="menu-toggle" id="menuBtn" onclick="toggleMenu()">
+          ☰
+        </span>
+      </div>
+
+      <!-- CONTENT -->
+      <div class="content">
+        <!-- ================= STATS ================= -->
+        <div class="stats">
+          <div class="card-box">
+            <h4>Departments</h4>
+            <p>{{ departments|length }}</p>
+          </div>
+
+          <div class="card-box">
+            <h4>Semesters</h4>
+            <p>{{ semesters|length }}</p>
+          </div>
+
+          <div class="card-box">
+            <h4>Faculty</h4>
+            <p>{{ faculties|length }}</p>
+          </div>
+
+          <div class="card-box">
+            <h4>Classrooms</h4>
+            <p>{{ classrooms|length }}</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Generate Timetable</h3>
+
+          <form method="POST" id="generateForm">
+            {% csrf_token %}
+
+            <!-- GENERATION TYPE -->
+            <label>Generation Type</label>
+
+            <select name="generate_type" id="generateType" required>
+              <option value="all">Generate All</option>
+
+              <option value="department">Generate by Department</option>
+
+              <option value="semester">Generate by Semester</option>
+            </select>
+
+            <!-- DEPARTMENT -->
+            <div id="departmentField">
+              <label>Select Department</label>
+
+              <select name="department">
+                <option value="">— select department —</option>
+
+                {% if departments %} {% for dept in departments %}
+                <option value="{{ dept.id }}">{{ dept.name }}</option>
+                {% endfor %} {% else %}
+                <option disabled>No Departments Found</option>
+                {% endif %}
+              </select>
+            </div>
+
+            <!-- SEMESTER -->
+            <div id="semesterField">
+              <label>Select Department</label>
+
+              <select name="semester_department" id="semesterDepartment">
+                <option value="">— select department —</option>
+
+                {% if departments %} {% for dept in departments %}
+                <option value="{{ dept.id }}">{{ dept.name }}</option>
+                {% endfor %} {% else %}
+                <option disabled>No Departments Found</option>
+                {% endif %}
+              </select>
+
+              <label style="margin-top: 15px">Select Semester</label>
+
+              <select name="semester" id="semesterSelect">
+                <option value="">— select semester —</option>
+
+                {% if semesters %} {% for sem in semesters %}
+                <option
+                  value="{{ sem.id }}"
+                  data-department="{{ sem.department.id }}"
+                >
+                  {{ sem.department.name }} – Sem {{ sem.semester_number }}
+                </option>
+                {% endfor %} {% else %}
+                <option disabled>No Semesters Found</option>
+                {% endif %}
+              </select>
+            </div>
+
+            <button type="submit" class="btn">Generate Timetable</button>
+          </form>
+
+          <!-- VIEW TIMETABLE -->
+          <form method="get" action="{% url 'timetable' %}">
+            <button
+              type="submit"
+              class="btn"
+              style="margin-top: 12px; background: #6366f1"
+            >
+              View Timetable
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+
+    <footer class="site-footer">
+      <div class="footer-left">
+        © 2026 <strong>TTGS</strong>
+        — Timetable Generation System
+      </div>
+
+      <div class="footer-right">
+        <a href="{% url 'teams' %}">Developers</a>
+        |
+        <a href="{% url 'admin_dashboard' %}">Home</a>
+        |
+        <a href="{% url 'logout' %}"> Logout </a>
+      </div>
+    </footer>
+
+    <!-- ─────────────────────────────
+   FLOATING CHATBOT
+───────────────────────────── -->
+
+    <div class="chatbot-wrapper">
+      <!-- FLOAT BUTTON -->
+      <button
+        class="chat-toggle-btn"
+        id="chatToggleBtn"
+        aria-label="Open chat assistant"
+      >
+        🤖
+      </button>
+
+      <!-- CHAT WINDOW -->
+      <div
+        class="chat-window"
+        id="chatWindow"
+        role="dialog"
+        aria-label="TTGS Assistant"
+      >
+        <!-- Header -->
+        <div class="cw-header">
+          <div class="cw-avatar">🤖</div>
+
+          <div class="cw-info">
+            <div class="cw-name">TTGS Assistant</div>
+            <div class="cw-status">
+              <div class="cw-status-dot"></div>
+              Online — always here to help
+            </div>
+          </div>
+
+          <div class="cw-header-actions">
+            <button class="cw-clear" id="cwClear" title="Clear chat">
+              Clear
+            </button>
+            <button class="cw-close" id="cwClose" aria-label="Close chat">
+              ✕
+            </button>
+          </div>
+        </div>
+
+        <!-- Messages -->
+        <div class="cw-body" id="cwBody">
+          <div class="welcome-card">
+            <div class="wc-icon">👋</div>
+            <h4>Welcome to TTGS Assistant</h4>
+            <p>
+              Ask me anything about timetable generation, faculty,<br />subjects,
+              classrooms, semesters, and more!
+            </p>
+          </div>
+        </div>
+
+        <!-- Chatbot Footer -->
+        <div class="cw-footer">
+          <input
+            class="cw-input"
+            id="cwInput"
+            type="text"
+            placeholder="Type your question..."
+            autocomplete="off"
+            maxlength="300"
+          />
+          <button class="cw-send" id="cwSend" aria-label="Send message">
+            ➤
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="{% static 'js/toggle.js' %}"></script>
+    <script src="{% static 'js/chatbot.js' %}"></script>
+    <script src="{% static 'js/generate.js' %}"></script>
+  </body>
+</html>

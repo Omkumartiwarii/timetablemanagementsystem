@@ -1,0 +1,957 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Login | TTGS — Academic Scheduler</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+
+    <style>
+      :root {
+        --cream: #f5f0e8;
+        --cream-2: #ede7d9;
+        --ink: #0d0d0d;
+        --ink-2: #1a1a1a;
+        --ink-3: #2d2d2d;
+        --gold: #b8943f;
+        --gold-light: #d4a853;
+        --gold-pale: rgba(184, 148, 63, 0.12);
+        --gold-dim: rgba(184, 148, 63, 0.06);
+        --text-body: #3a3228;
+        --text-muted: #7a7060;
+        --border: rgba(13, 13, 13, 0.12);
+        --border-strong: rgba(13, 13, 13, 0.22);
+        --error: #8b3a2a;
+        --error-bg: rgba(139, 58, 42, 0.07);
+        --r: 4px;
+        --ease: cubic-bezier(0.22, 0.68, 0, 1.2);
+      }
+
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        font-size: 16px;
+        height: 100%;
+      }
+
+      body {
+        font-family: "DM Sans", system-ui, sans-serif;
+        background: var(--cream);
+        color: var(--ink);
+        min-height: 100vh;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        overflow: hidden;
+      }
+
+      /* Grain */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+        background-size: 180px 180px;
+        pointer-events: none;
+        z-index: 0;
+        opacity: 0.5;
+      }
+
+      /* ── LEFT PANEL ── */
+      .left-panel {
+        background: var(--ink-2);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 52px 56px;
+        overflow: hidden;
+        min-height: 100vh;
+      }
+
+      /* Ruled lines on dark bg */
+      .left-panel::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 47px,
+          rgba(184, 148, 63, 0.05) 47px,
+          rgba(184, 148, 63, 0.05) 48px
+        );
+        pointer-events: none;
+      }
+
+      /* Big decorative letter */
+      .left-deco {
+        position: absolute;
+        right: -6%;
+        bottom: -10%;
+        font-family: "Playfair Display", serif;
+        font-size: clamp(180px, 22vw, 340px);
+        font-weight: 900;
+        font-style: italic;
+        color: transparent;
+        -webkit-text-stroke: 1px rgba(184, 148, 63, 0.08);
+        line-height: 1;
+        pointer-events: none;
+        user-select: none;
+        z-index: 0;
+      }
+
+      .left-top {
+        position: relative;
+        z-index: 1;
+      }
+
+      /* Brand */
+      .left-brand {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 64px;
+      }
+      .logo-badge {
+        width: 44px;
+        height: 44px;
+        background: var(--gold);
+        border-radius: var(--r);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .logo-badge span {
+        font-family: "DM Mono", monospace;
+        font-size: 10px;
+        font-weight: 500;
+        letter-spacing: 0.06em;
+        color: var(--ink);
+        text-align: center;
+        line-height: 1.3;
+      }
+      .brand-text-wrap {
+        display: flex;
+        flex-direction: column;
+        line-height: 1;
+      }
+      .brand-name-lg {
+        font-family: "Playfair Display", serif;
+        font-size: 19px;
+        font-weight: 700;
+        color: var(--cream);
+        letter-spacing: 0.02em;
+      }
+      .brand-sub-lg {
+        font-size: 10px;
+        font-weight: 500;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: rgba(245, 240, 232, 0.35);
+        margin-top: 3px;
+        font-family: "DM Mono", monospace;
+      }
+
+      /* Left headline */
+      .left-headline {
+        font-family: "Playfair Display", serif;
+        font-size: clamp(32px, 3.2vw, 52px);
+        font-weight: 900;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+        color: var(--cream);
+        margin-bottom: 20px;
+      }
+      .left-headline em {
+        font-style: italic;
+        color: var(--gold-light);
+      }
+
+      .left-desc {
+        font-size: 14.5px;
+        line-height: 1.85;
+        color: rgba(245, 240, 232, 0.45);
+        font-weight: 300;
+        max-width: 340px;
+        margin-bottom: 48px;
+      }
+
+      /* Feature list */
+      .left-features {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+      }
+      .left-feature {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 0;
+        border-bottom: 1px solid rgba(184, 148, 63, 0.1);
+      }
+      .left-feature:last-child {
+        border-bottom: none;
+      }
+      .feature-dot {
+        width: 32px;
+        height: 32px;
+        flex-shrink: 0;
+        background: rgba(184, 148, 63, 0.1);
+        border: 1px solid rgba(184, 148, 63, 0.2);
+        border-radius: var(--r);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--gold-light);
+        font-size: 13px;
+      }
+      .left-feature span {
+        font-size: 13px;
+        font-weight: 400;
+        color: rgba(245, 240, 232, 0.55);
+        letter-spacing: 0.01em;
+      }
+
+      /* Left bottom */
+      .left-bottom {
+        position: relative;
+        z-index: 1;
+      }
+      .left-footer-text {
+        font-family: "DM Mono", monospace;
+        font-size: 10px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: rgba(184, 148, 63, 0.4);
+      }
+      .left-rule {
+        width: 100%;
+        height: 1px;
+        background: rgba(184, 148, 63, 0.12);
+        margin-bottom: 20px;
+      }
+
+      /* ── RIGHT PANEL ── */
+      .right-panel {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 48px 40px;
+        background: var(--cream);
+        min-height: 100vh;
+        overflow-y: auto;
+      }
+
+      /* Vertical gold rule on left edge of right panel */
+      .right-panel::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 10%;
+        bottom: 10%;
+        width: 1px;
+        background: var(--border);
+      }
+
+      .login-box {
+        width: 100%;
+        max-width: 420px;
+      }
+
+      /* Top eyebrow */
+      .login-eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-family: "DM Mono", monospace;
+        font-size: 10px;
+        font-weight: 500;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--gold);
+        margin-bottom: 10px;
+      }
+      .login-eyebrow::before {
+        content: "";
+        width: 20px;
+        height: 1px;
+        background: var(--gold);
+      }
+
+      .login-title {
+        font-family: "Playfair Display", serif;
+        font-size: 32px;
+        font-weight: 900;
+        line-height: 1.1;
+        color: var(--ink);
+        margin-bottom: 6px;
+        letter-spacing: -0.02em;
+      }
+      .login-title em {
+        font-style: italic;
+        color: var(--gold);
+      }
+
+      .login-subtitle {
+        font-size: 14px;
+        color: var(--text-muted);
+        font-weight: 300;
+        margin-bottom: 32px;
+        line-height: 1.6;
+      }
+
+      /* ── TABS ── */
+      .tab-bar {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0;
+        border: 1px solid var(--border);
+        border-radius: var(--r);
+        overflow: hidden;
+        margin-bottom: 28px;
+        background: var(--cream-2);
+      }
+      .tab-btn {
+        padding: 11px 8px;
+        background: transparent;
+        border: none;
+        border-right: 1px solid var(--border);
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        cursor: pointer;
+        transition:
+          background 0.2s,
+          color 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+      }
+      .tab-btn:last-child {
+        border-right: none;
+      }
+      .tab-btn i {
+        font-size: 13px;
+      }
+      .tab-btn.active {
+        background: var(--ink);
+        color: var(--gold-light);
+      }
+      .tab-btn:not(.active):hover {
+        background: var(--cream);
+        color: var(--ink);
+      }
+
+      /* ── ERROR ── */
+      .error-msg {
+        background: var(--error-bg);
+        border: 1px solid rgba(139, 58, 42, 0.2);
+        border-left: 3px solid var(--error);
+        border-radius: var(--r);
+        padding: 12px 16px;
+        font-size: 13px;
+        color: var(--error);
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .error-msg i {
+        font-size: 14px;
+        flex-shrink: 0;
+      }
+
+      /* ── FORMS ── */
+      .login-form {
+        display: none;
+      }
+      .login-form.active {
+        display: block;
+      }
+
+      .form-header {
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border);
+      }
+      .form-role-label {
+        font-family: "DM Mono", monospace;
+        font-size: 10px;
+        font-weight: 500;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+      }
+      .form-role-desc {
+        font-size: 13px;
+        color: var(--text-muted);
+        font-weight: 300;
+        line-height: 1.6;
+      }
+
+      .field {
+        margin-bottom: 18px;
+      }
+      .field-label {
+        display: block;
+        font-family: "DM Mono", monospace;
+        font-size: 10px;
+        font-weight: 500;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+      }
+      .field-inner {
+        position: relative;
+      }
+
+      .field-inner input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid var(--border);
+        border-radius: var(--r);
+        background: #fff;
+        color: var(--ink);
+        font-family: "DM Sans", sans-serif;
+        font-size: 14.5px;
+        font-weight: 400;
+        outline: none;
+        transition:
+          border-color 0.2s,
+          box-shadow 0.2s;
+      }
+      .field-inner input::placeholder {
+        color: rgba(122, 112, 96, 0.5);
+      }
+      .field-inner input:focus {
+        border-color: var(--gold);
+        box-shadow: 0 0 0 3px var(--gold-pale);
+      }
+
+      /* Password toggle */
+      .toggle-password {
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: var(--text-muted);
+        font-size: 15px;
+        line-height: 1;
+        transition: color 0.2s;
+        user-select: none;
+      }
+      .toggle-password:hover {
+        color: var(--ink);
+      }
+      input[type="password"] {
+        padding-right: 44px;
+      }
+
+      /* Field with icon prefix */
+      .field-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        font-size: 14px;
+        pointer-events: none;
+      }
+      .has-icon input {
+        padding-left: 42px;
+      }
+
+      /* ── SUBMIT ── */
+      .submit-btn {
+        width: 100%;
+        padding: 14px;
+        background: var(--ink);
+        color: var(--gold-light);
+        font-family: "DM Mono", monospace;
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        border: none;
+        border-radius: var(--r);
+        cursor: pointer;
+        margin-top: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition:
+          background 0.22s,
+          transform 0.22s var(--ease),
+          box-shadow 0.22s;
+        position: relative;
+        overflow: hidden;
+      }
+      .submit-btn::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(184, 148, 63, 0.08),
+          transparent
+        );
+        transform: translateX(-100%);
+        transition: transform 0.6s ease;
+      }
+      .submit-btn:hover {
+        background: var(--ink-3);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(13, 13, 13, 0.2);
+      }
+      .submit-btn:hover::before {
+        transform: translateX(100%);
+      }
+      .submit-btn:active {
+        transform: translateY(0);
+      }
+      .submit-btn i {
+        font-size: 14px;
+      }
+
+      /* ── STATS BAR ── */
+      .stats-bar {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0;
+        margin-top: 28px;
+        border: 1px solid var(--border);
+        border-radius: var(--r);
+        overflow: hidden;
+        background: var(--cream-2);
+      }
+      .stat-item {
+        padding: 14px 12px;
+        text-align: center;
+        border-right: 1px solid var(--border);
+      }
+      .stat-item:last-child {
+        border-right: none;
+      }
+      .stat-num {
+        font-family: "Playfair Display", serif;
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--ink);
+        line-height: 1;
+        margin-bottom: 4px;
+      }
+      .stat-label {
+        font-family: "DM Mono", monospace;
+        font-size: 9px;
+        font-weight: 500;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+      }
+
+      /* Back link */
+      .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        text-decoration: none;
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-top: 24px;
+        transition: color 0.2s;
+      }
+      .back-link:hover {
+        color: var(--ink);
+      }
+      .back-link i {
+        font-size: 12px;
+      }
+
+      /* ── RESPONSIVE ── */
+      @media (max-width: 900px) {
+        body {
+          grid-template-columns: 1fr;
+          overflow: auto;
+        }
+        .left-panel {
+          display: none;
+        }
+        .right-panel {
+          min-height: 100vh;
+          padding: 40px 24px;
+          justify-content: flex-start;
+          padding-top: 60px;
+        }
+        .right-panel::before {
+          display: none;
+        }
+        .login-box {
+          max-width: 100%;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .right-panel {
+          padding: 32px 16px;
+        }
+        .tab-btn {
+          font-size: 10px;
+          gap: 5px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- ══ LEFT PANEL ══ -->
+    <div class="left-panel">
+      <div class="left-deco">S</div>
+
+      <div class="left-top">
+        <!-- Brand -->
+        <div class="left-brand">
+          <div class="logo-badge">
+            <span>TT<br />GS</span>
+          </div>
+          <div class="brand-text-wrap">
+            <span class="brand-name-lg">TTGS</span>
+            <span class="brand-sub-lg">Academic Scheduler</span>
+          </div>
+        </div>
+
+        <!-- Headline -->
+        <h1 class="left-headline">
+          Your schedule,<br />
+          <em>intelligently</em><br />
+          organized.
+        </h1>
+
+        <p class="left-desc">
+          TTGS automates timetable generation for academic institutions —
+          eliminating conflicts and manual effort, every semester.
+        </p>
+
+        <!-- Features -->
+        <div class="left-features">
+          <div class="left-feature">
+            <div class="feature-dot"><i class="fa-solid fa-bolt"></i></div>
+            <span>Conflict-free schedules generated in seconds</span>
+          </div>
+          <div class="left-feature">
+            <div class="feature-dot">
+              <i class="fa-solid fa-chalkboard-user"></i>
+            </div>
+            <span>Faculty, room & subject management in one place</span>
+          </div>
+          <div class="left-feature">
+            <div class="feature-dot"><i class="fa-solid fa-lock"></i></div>
+            <span>Role-based access for admins, faculty & students</span>
+          </div>
+          <div class="left-feature">
+            <div class="feature-dot"><i class="fa-solid fa-expand"></i></div>
+            <span>Scales for any institution size</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="left-bottom">
+        <div class="left-rule"></div>
+        <div class="left-footer-text">
+          © 2026 TTGS — Smart Timetable Generator System
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ RIGHT PANEL ══ -->
+    <div class="right-panel">
+      <div class="login-box">
+        <div class="login-eyebrow">Secure Access</div>
+        <h2 class="login-title">Welcome<br /><em>back.</em></h2>
+        <p class="login-subtitle">
+          Sign in to your TTGS account to manage schedules and timetables.
+        </p>
+
+        <!-- TABS -->
+        <div class="tab-bar">
+          <button
+            class="tab-btn active"
+            id="tabAdmin"
+            onclick="switchTab('admin')"
+          >
+            <i class="fa-solid fa-shield-halved"></i> Admin
+          </button>
+          <button
+            class="tab-btn"
+            id="tabFaculty"
+            onclick="switchTab('faculty')"
+          >
+            <i class="fa-solid fa-chalkboard-user"></i> Faculty
+          </button>
+          <button
+            class="tab-btn"
+            id="tabStudent"
+            onclick="switchTab('student')"
+          >
+            <i class="fa-solid fa-user-graduate"></i> Student
+          </button>
+        </div>
+
+        <!-- ERROR -->
+        {% if messages %} {% for message in messages %}
+        <div class="error-msg">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          {{ message }}
+        </div>
+        {% endfor %} {% endif %}
+
+        <!-- ADMIN FORM -->
+        <form method="POST" id="adminForm" class="login-form active">
+          {% csrf_token %}
+          <div class="form-header">
+            <div class="form-role-label">Administrator</div>
+            <div class="form-role-desc">
+              Full system access — manage faculty, rooms, subjects, and generate
+              timetables.
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field-label">Username</label>
+            <div class="field-inner has-icon">
+              <i class="fa-solid fa-user field-icon"></i>
+              <input
+                type="text"
+                name="username"
+                placeholder="Enter admin username"
+                required
+                autocomplete="username"
+              />
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field-label">Password</label>
+            <div class="field-inner has-icon">
+              <i class="fa-solid fa-lock field-icon"></i>
+              <input
+                type="password"
+                id="adminPassword"
+                name="password"
+                placeholder="Enter password"
+                required
+                autocomplete="current-password"
+              />
+              <span
+                class="toggle-password"
+                onclick="togglePassword('adminPassword', this)"
+                aria-label="Toggle password visibility"
+              >
+                <i class="fa-regular fa-eye"></i>
+              </span>
+            </div>
+          </div>
+
+          <button type="submit" name="role" value="admin" class="submit-btn">
+            <i class="fa-solid fa-arrow-right-to-bracket"></i>
+            Login as Admin
+          </button>
+        </form>
+
+        <!-- FACULTY FORM -->
+        <form method="POST" id="facultyForm" class="login-form">
+          {% csrf_token %}
+          <div class="form-header">
+            <div class="form-role-label">Faculty Member</div>
+            <div class="form-role-desc">
+              Access your assigned timetables, class schedules, and teaching
+              workload.
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field-label">Faculty Username</label>
+            <div class="field-inner has-icon">
+              <i class="fa-solid fa-chalkboard-user field-icon"></i>
+              <input
+                type="text"
+                name="faculty_username"
+                placeholder="Enter faculty username"
+                required
+                autocomplete="username"
+              />
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field-label">Password</label>
+            <div class="field-inner has-icon">
+              <i class="fa-solid fa-lock field-icon"></i>
+              <input
+                type="password"
+                id="facultyPassword"
+                name="faculty_password"
+                placeholder="Enter password"
+                required
+                autocomplete="current-password"
+              />
+              <span
+                class="toggle-password"
+                onclick="togglePassword('facultyPassword', this)"
+                aria-label="Toggle password visibility"
+              >
+                <i class="fa-regular fa-eye"></i>
+              </span>
+            </div>
+          </div>
+
+          <button type="submit" name="role" value="faculty" class="submit-btn">
+            <i class="fa-solid fa-arrow-right-to-bracket"></i>
+            Login as Faculty
+          </button>
+        </form>
+
+        <!-- STUDENT FORM -->
+        <form method="POST" id="studentForm" class="login-form">
+          {% csrf_token %}
+          <div class="form-header">
+            <div class="form-role-label">Student Access</div>
+            <div class="form-role-desc">
+              View your class timetable using your enrollment number — no
+              password required.
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field-label">Enrollment Number</label>
+            <div class="field-inner has-icon">
+              <i class="fa-solid fa-id-card field-icon"></i>
+              <input
+                type="text"
+                name="enrollment"
+                placeholder="e.g. 2024CS001"
+                autocomplete="off"
+              />
+            </div>
+          </div>
+
+          <button type="submit" name="role" value="student" class="submit-btn">
+            <i class="fa-solid fa-calendar-days"></i>
+            View My Timetable
+          </button>
+        </form>
+
+        <!-- STATS -->
+        <div class="stats-bar">
+          <div class="stat-item">
+            <div class="stat-num">120+</div>
+            <div class="stat-label">Courses</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">100+</div>
+            <div class="stat-label">Faculty</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">500+</div>
+            <div class="stat-label">Students</div>
+          </div>
+        </div>
+
+        <a href="{% url 'home' %}" class="back-link">
+          <i class="fa-solid fa-arrow-left"></i>
+          Back to Home
+        </a>
+      </div>
+    </div>
+
+    <script>
+      // ── TAB SWITCH ──
+      const forms = {
+        admin: "adminForm",
+        faculty: "facultyForm",
+        student: "studentForm",
+      };
+      const tabBtns = {
+        admin: "tabAdmin",
+        faculty: "tabFaculty",
+        student: "tabStudent",
+      };
+
+      function switchTab(role) {
+        Object.keys(forms).forEach((r) => {
+          document
+            .getElementById(forms[r])
+            .classList.toggle("active", r === role);
+          document
+            .getElementById(tabBtns[r])
+            .classList.toggle("active", r === role);
+        });
+      }
+
+      // ── PASSWORD TOGGLE ──
+      function togglePassword(id, el) {
+        const input = document.getElementById(id);
+        const icon = el.querySelector("i");
+        if (input.type === "password") {
+          input.type = "text";
+          icon.className = "fa-regular fa-eye-slash";
+        } else {
+          input.type = "password";
+          icon.className = "fa-regular fa-eye";
+        }
+      }
+
+      // ── SUBMIT LOADING STATE ──
+      document.querySelectorAll(".submit-btn").forEach((btn) => {
+        btn.closest("form").addEventListener("submit", function () {
+          const roleValue = btn.value;
+          btn.innerHTML =
+            '<i class="fa-solid fa-circle-notch fa-spin"></i> Authenticating...';
+          btn.style.opacity = "0.75";
+          // disabled NAHI karo — warna role POST mein nahi jaata
+        });
+      });
+    </script>
+  </body>
+</html>

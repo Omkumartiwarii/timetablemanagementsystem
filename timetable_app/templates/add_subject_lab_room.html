@@ -1,0 +1,272 @@
+{% load static %}
+
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Assign Lab Room | TTGS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+```
+<link
+  href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
+  rel="stylesheet"
+/>
+
+<link rel="stylesheet" href="{% static 'css/templates.css' %}" />
+```
+
+  </head>
+
+  <body>
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="logo-box">
+        <img src="{% static 'images/logo.png' %}" />
+        <h2>TTGS Admin</h2>
+      </div>
+
+
+  <div class="menu">
+    <a href="{% url 'add_faculty' %}">Teachers</a>
+    <a href="{% url 'add_timeslot' %}">Timing</a>
+    <a href="{% url 'add_subject' %}">Subjects</a>
+    <a href="{% url 'add_department' %}">Departments</a>
+    <a href="{% url 'add_subject_faculty' %}">Assign Subject</a>
+    <a href="{% url 'add_subject_lab_room' %}" class="active">Assign Lab Room</a>
+    <a href="{% url 'add_classroom' %}">Classrooms</a>
+    <a href="{% url 'add_semester' %}">Semesters</a>
+    <a href="{% url 'generate' %}">Generate Time Table</a>
+    <a href="{% url 'remove_timetable' %}">Remove Timetable</a>
+    <a href="{% url 'timetable' %}">View Timetable</a>
+  </div>
+
+  <div class="bottom-links">
+    <hr style="margin: 15px 0; border-color: rgba(255,255,255,0.2)" />
+
+    <a href="{% url 'admin_dashboard' %}">🏠︎ Home</a>
+    <a href="{% url 'logout' %}">⏻ Logout</a>
+  </div>
+</div>
+
+<div class="overlay" id="overlay"></div>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <h2>Assign Lab Room</h2>
+    </div>
+
+    <div class="topbar-right">
+      <a href="{% url 'admin_dashboard' %}">🏠︎ Home</a>
+      <a href="{% url 'logout' %}">⏻ Logout</a>
+    </div>
+
+    <span class="menu-toggle" onclick="toggleMenu()" id="menuBtn">
+      ☰
+    </span>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+    <!-- STATS -->
+    <div class="stats">
+      <div class="card-box">
+        <h4>Departments</h4>
+        <p>{{ departments|length }}</p>
+      </div>
+
+      <div class="card-box">
+        <h4>Semesters</h4>
+        <p>{{ semesters|length }}</p>
+      </div>
+
+      <div class="card-box">
+        <h4>Lab Subjects</h4>
+        <p>{{ subjects|length }}</p>
+      </div>
+
+      <div class="card-box">
+        <h4>Lab Rooms</h4>
+        <p>{{ classrooms|length }}</p>
+      </div>
+    </div>
+
+    <!-- ASSIGN FORM -->
+    <div class="card">
+      <h3>🧪 Assign Lab Room to Practical Subject</h3>
+
+      <form method="post">
+        {% csrf_token %}
+
+        <!-- DEPARTMENT -->
+        <label>Select Department</label>
+        {{ form.department }}
+
+        <!-- SEMESTER -->
+        <label>Select Semester</label>
+        {{ form.semester }}
+
+        <!-- SUBJECT -->
+        <label>Select Practical Subject</label>
+        {{ form.subject }}
+
+        <!-- LAB ROOM -->
+        <label>Select Lab Room</label>
+        {{ form.classroom }}
+
+        <button type="submit" class="btn">
+          Assign Lab Room
+        </button>
+      </form>
+
+      <!-- VIEW BUTTON -->
+      <form method="get">
+        <button
+          type="submit"
+          name="view_list"
+          value="true"
+          class="btn"
+        >
+          View Assignments
+        </button>
+      </form>
+    </div>
+
+    <!-- ASSIGNMENT LIST -->
+    {% if assignment_list != None %}
+
+    <div class="table-card" style="margin-top: 30px">
+      <h3 style="margin-bottom: 20px">
+        🧪 Assigned Lab Rooms
+      </h3>
+
+      <table width="100%" cellpadding="12">
+        <thead>
+          <tr>
+            <th align="left">ID</th>
+            <th align="left">Subject</th>
+            <th align="left">Lab Room</th>
+            <th align="left">Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% if assignment_list %}
+
+          {% for a in assignment_list %}
+
+          <tr>
+            <td>{{ a.id }}</td>
+
+            <td>{{ a.subject.name }}</td>
+
+            <td>{{ a.classroom.room_number }}</td>
+
+            <td>
+              {% if a.id %}
+
+              <button
+                class="delete-btn"
+                data-url="{% url 'delete_subject_lab_room' a.id %}"
+                onclick="openDeleteModal(this.dataset.url)"
+              >
+                Remove
+              </button>
+
+              {% else %}
+
+              <button class="delete-btn" disabled>
+                Invalid
+              </button>
+
+              {% endif %}
+            </td>
+          </tr>
+
+          {% endfor %}
+
+          {% else %}
+
+          <tr>
+            <td colspan="4" style="text-align:center">
+              No Assignments Found
+            </td>
+          </tr>
+
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+
+    {% endif %}
+  </div>
+</div>
+
+<!-- DELETE MODAL -->
+<div id="deleteModal" class="modal-overlay">
+  <div class="modal-box">
+    <h2>Delete Assignment</h2>
+
+    <p>
+      Are you sure you want to remove this assignment?
+    </p>
+
+    <div class="modal-buttons">
+      <button
+        class="cancel-btn"
+        onclick="closeDeleteModal()"
+      >
+        Cancel
+      </button>
+
+      <a id="confirmDeleteBtn" href="#">
+        <button class="confirm-btn">
+          Yes, Delete
+        </button>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- FILTER SCRIPT -->
+<script>
+  document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+      const department =
+        document.getElementById(
+          "id_department"
+        );
+
+      const semester =
+        document.getElementById(
+          "id_semester"
+        );
+
+      department.addEventListener(
+        "change",
+        function () {
+          semester.form.submit();
+        }
+      );
+
+      semester.addEventListener(
+        "change",
+        function () {
+          semester.form.submit();
+        }
+      );
+    }
+  );
+</script>
+
+<script src="{% static 'js/all-js.js' %}"></script>
+```
+
+  </body>
+</html>

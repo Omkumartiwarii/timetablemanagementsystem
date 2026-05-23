@@ -1,0 +1,297 @@
+{% load static %}
+
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{{ title|default:"Add Time Slot" }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{% static 'css/templates.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/chatbot.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/footer.css' %}" />
+  </head>
+
+  <body>
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="logo-box">
+        <img src="{% static 'images/logo.png' %}" />
+        <h2>TTGS Admin</h2>
+      </div>
+
+      <div class="menu">
+        <a href="{% url 'add_faculty' %}">Teachers</a>
+        <a href="{% url 'add_timeslot' %}" class="active">Timing</a>
+        <a href="{% url 'add_subject' %}">Subjects</a>
+        <a href="{% url 'add_department' %}">Departments</a>
+        <a href="{% url 'add_subject_faculty' %}">Assign Subject</a>
+        <a href="{% url 'add_subject_lab_room' %}">Assign Lab Room</a>
+        <a href="{% url 'add_classroom' %}">Classrooms</a>
+        <a href="{% url 'add_semester' %}">Semesters</a>
+        <a href="{% url 'generate' %}">Generate Time Table</a>
+        <a href="{% url 'remove_timetable' %}">Remove Timetable</a>
+        <a href="{% url 'timetable' %}">View Timetable</a>
+      </div>
+
+      <div class="bottom-links">
+        <hr style="margin: 15px 0; border-color: rgba(255, 255, 255, 0.2)" />
+
+        <a href="{% url 'admin_dashboard' %}"> 🏠︎ Home </a>
+
+        <a href="{% url 'logout' %}"> ⏻ Logout </a>
+      </div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+
+    <!-- MAIN -->
+    <div class="main">
+      <!-- TOPBAR -->
+      <div class="topbar">
+        <div class="topbar-left">
+          <h2>Add Time Slot</h2>
+        </div>
+
+        <div class="topbar-right">
+          <a href="{% url 'admin_dashboard' %}"> 🏠︎ Home </a>
+
+          <a href="{% url 'logout' %}"> ⏻ Logout </a>
+        </div>
+
+        <span class="menu-toggle" id="menuBtn" onclick="toggleMenu()">
+          ☰
+        </span>
+      </div>
+
+      <!-- CONTENT -->
+      <div class="content">
+        <!-- STATS -->
+        <div class="stats">
+          <div class="card-box">
+            <h4>Departments</h4>
+            <p>{{ departments }}</p>
+          </div>
+
+          <div class="card-box">
+            <h4>Semesters</h4>
+            <p>{{ semesters }}</p>
+          </div>
+
+          <div class="card-box">
+            <h4>Faculty</h4>
+            <p>{{ faculties }}</p>
+          </div>
+
+          <div class="card-box">
+            <h4>Subjects</h4>
+            <p>{{ subjects }}</p>
+          </div>
+        </div>
+
+        <!-- FORM CARD -->
+        <div class="card">
+          <h3>{{ title|default:"Add Time Slot" }}</h3>
+
+          <form method="post">
+            {% csrf_token %} {% for field in form %}
+
+            <label>{{ field.label }}</label>
+
+            {{ field }} {% endfor %}
+
+            <button type="submit" class="btn">Save Time Slot</button>
+          </form>
+
+          <!-- VIEW BUTTON -->
+          <!-- <div style="margin-top: 20px">
+            <a href="?view_list=true" class="btn"> View Time Slots </a>
+          </div> -->
+
+          <form method="get">
+            <button type="submit" name="view_list" value="true" class="btn">
+              View Time Slots
+            </button>
+          </form>
+        </div>
+
+        <!-- TIMESLOT LIST -->
+        {% if timeslots != None %}
+
+        <div class="table-card" style="margin-top: 30px">
+          <h3 style="margin-bottom: 20px">⏰ Time Slot List</h3>
+
+          <table width="100%" cellpadding="12">
+            <thead>
+              <tr>
+                <th align="left">Day</th>
+
+                <th align="left">Start Time</th>
+
+                <th align="left">End Time</th>
+
+                <th align="left">Action</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {% if timeslots %} {% for t in timeslots %}
+
+              <tr>
+                <td>{{ t.day }}</td>
+
+                <td>{{ t.start_time }}</td>
+
+                <td>{{ t.end_time }}</td>
+
+                <td>
+                  {% if t.id %}
+                  <button
+                    class="delete-btn"
+                    data-url="{% url 'delete_timeslot' t.id %}"
+                    onclick="openDeleteModal(this.dataset.url)"
+                  >
+                    Remove
+                  </button>
+
+                  {% else %}
+
+                  <button class="delete-btn" disabled>Invalid</button>
+
+                  {% endif %}
+                </td>
+              </tr>
+
+              {% endfor %} {% else %}
+
+              <tr>
+                <td colspan="4" style="text-align: center">
+                  No Time Slots Found
+                </td>
+              </tr>
+
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- DELETE MODAL -->
+    <div id="deleteModal" class="modal-overlay">
+      <div class="modal-box">
+        <h2>Delete Time Slot</h2>
+
+        <p>Are you sure you want to delete this time slot?</p>
+
+        <div class="modal-buttons">
+          <button class="cancel-btn" onclick="closeDeleteModal()">
+            Cancel
+          </button>
+
+          <a id="confirmDeleteBtn" href="#">
+            <button class="confirm-btn">Yes, Delete</button>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+
+    <footer class="site-footer">
+      <div class="footer-left">
+        © 2026 <strong>TTGS</strong>
+        — Timetable Generation System
+      </div>
+
+      <div class="footer-right">
+        <a href="{% url 'teams' %}">Developers</a>
+        |
+        <a href="{% url 'admin_dashboard' %}">Home</a>
+        |
+        <a href="{% url 'logout' %}"> Logout </a>
+      </div>
+    </footer>
+
+    <!-- ─────────────────────────────
+   FLOATING CHATBOT
+───────────────────────────── -->
+
+    <div class="chatbot-wrapper">
+      <!-- FLOAT BUTTON -->
+      <button
+        class="chat-toggle-btn"
+        id="chatToggleBtn"
+        aria-label="Open chat assistant"
+      >
+        🤖
+      </button>
+
+      <!-- CHAT WINDOW -->
+      <div
+        class="chat-window"
+        id="chatWindow"
+        role="dialog"
+        aria-label="TTGS Assistant"
+      >
+        <!-- Header -->
+        <div class="cw-header">
+          <div class="cw-avatar">🤖</div>
+
+          <div class="cw-info">
+            <div class="cw-name">TTGS Assistant</div>
+            <div class="cw-status">
+              <div class="cw-status-dot"></div>
+              Online — always here to help
+            </div>
+          </div>
+
+          <div class="cw-header-actions">
+            <button class="cw-clear" id="cwClear" title="Clear chat">
+              Clear
+            </button>
+            <button class="cw-close" id="cwClose" aria-label="Close chat">
+              ✕
+            </button>
+          </div>
+        </div>
+
+        <!-- Messages -->
+        <div class="cw-body" id="cwBody">
+          <div class="welcome-card">
+            <div class="wc-icon">👋</div>
+            <h4>Welcome to TTGS Assistant</h4>
+            <p>
+              Ask me anything about timetable generation, faculty,<br />subjects,
+              classrooms, semesters, and more!
+            </p>
+          </div>
+        </div>
+
+        <!-- Chatbot Footer -->
+        <div class="cw-footer">
+          <input
+            class="cw-input"
+            id="cwInput"
+            type="text"
+            placeholder="Type your question..."
+            autocomplete="off"
+            maxlength="300"
+          />
+          <button class="cw-send" id="cwSend" aria-label="Send message">
+            ➤
+          </button>
+        </div>
+      </div>
+    </div>
+    <script src="{% static 'js/toggle.js' %}"></script>
+    <script src="{% static 'js/chatbot.js' %}"></script>
+  </body>
+</html>

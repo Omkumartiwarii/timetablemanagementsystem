@@ -1,0 +1,1114 @@
+/* =========================================================
+   GOOGLE FONTS — TTGS Design System
+========================================================= */
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap");
+
+/* =========================================================
+   DESIGN TOKENS
+========================================================= */
+:root {
+  --cream: #f5f0e8;
+  --cream-2: #ede7d9;
+  --cream-3: #e4ddd0;
+  --ink: #0d0d0d;
+  --ink-2: #1a1a1a;
+  --ink-3: #2d2d2d;
+
+  --gold: #b8943f;
+  --gold-light: #d4a853;
+  --gold-pale: rgba(184, 148, 63, 0.12);
+  --gold-dim: rgba(184, 148, 63, 0.06);
+  --gold-border: rgba(184, 148, 63, 0.22);
+
+  --surface: #ffffff;
+  --surface-2: #faf8f4;
+
+  --text-primary: #0d0d0d;
+  --text-body: #3a3228;
+  --text-muted: #7a7060;
+  --text-faint: #a89e90;
+
+  --border: rgba(13, 13, 13, 0.09);
+  --border-mid: rgba(13, 13, 13, 0.15);
+  --border-strong: rgba(13, 13, 13, 0.24);
+
+  --success: #2a6642;
+  --success-bg: #eaf4ee;
+  --danger: #8b3a2a;
+  --danger-bg: #f9eeec;
+  --info: #1d4b8f;
+  --info-bg: #eaf0fb;
+
+  --nav-h: 80px;
+  --r: 4px;
+  --r-md: 8px;
+  --r-lg: 12px;
+
+  --shadow-sm:
+    0 1px 4px rgba(13, 13, 13, 0.06), 0 2px 12px rgba(13, 13, 13, 0.04);
+  --shadow-md:
+    0 4px 20px rgba(13, 13, 13, 0.09), 0 1px 4px rgba(13, 13, 13, 0.05);
+
+  --ease: cubic-bezier(0.22, 0.68, 0, 1.2);
+}
+
+/* =========================================================
+   RESET & BASE
+========================================================= */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: "DM Sans", system-ui, sans-serif;
+  background: var(--cream);
+  color: var(--text-primary);
+  min-height: 100vh;
+  padding-top: var(--nav-h);
+}
+
+/* Grain texture */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.5;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* =========================================================
+   SCROLLBAR
+========================================================= */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: var(--cream-2);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--gold);
+  border-radius: 99px;
+}
+
+/* =========================================================
+   FIXED NAVBAR
+========================================================= */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--nav-h);
+  z-index: 1000;
+  background: var(--ink-2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 36px;
+  transform: translateZ(0);
+}
+
+/* Gold top rule */
+.navbar::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--gold),
+    var(--gold-light),
+    transparent
+  );
+}
+
+/* Ruled lines on navbar */
+.navbar::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(184, 148, 63, 0.15);
+}
+
+/* Brand */
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.nav-logo {
+  width: 38px;
+  height: 38px;
+  object-fit: cover;
+}
+.nav-logo-badge {
+  width: 38px;
+  height: 38px;
+  background: var(--gold);
+  border-radius: var(--r);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.nav-logo-badge span {
+  font-family: "DM Mono", monospace;
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--ink);
+  text-align: center;
+  line-height: 1.3;
+}
+.nav-title-group {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+.nav-title {
+  font-family: "Playfair Display", serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--cream);
+  letter-spacing: 0.02em;
+}
+.nav-sub {
+  font-family: "DM Mono", monospace;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(184, 148, 63, 0.6);
+  margin-top: 3px;
+}
+
+/* Nav right */
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 8px 18px;
+  border-radius: var(--r);
+  font-family: "DM Mono", monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background 0.22s,
+    transform 0.22s var(--ease),
+    box-shadow 0.22s;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn i {
+  font-size: 13px;
+}
+.btn-label {
+  display: inline;
+}
+
+.btn-download {
+  background: var(--gold);
+  color: var(--ink);
+  box-shadow: 0 2px 12px rgba(184, 148, 63, 0.3);
+}
+.btn-download:hover {
+  background: var(--gold-light);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(184, 148, 63, 0.4);
+}
+.btn-download:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-logout {
+  background: transparent;
+  color: rgba(245, 240, 232, 0.5);
+  border: 1px solid rgba(184, 148, 63, 0.2);
+}
+.btn-logout:hover {
+  background: var(--ink-3);
+  color: var(--gold-light);
+  border-color: var(--gold-border);
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   MAIN CONTENT
+========================================================= */
+.main {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 40px 28px 60px;
+  position: relative;
+  z-index: 1;
+}
+
+/* =========================================================
+   PAGE HEAD
+========================================================= */
+.page-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.page-eyebrow {
+  font-family: "DM Mono", monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.page-eyebrow::before {
+  content: "";
+  width: 16px;
+  height: 1px;
+  background: var(--gold);
+}
+
+.page-heading {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(26px, 3.5vw, 38px);
+  font-weight: 900;
+  color: var(--ink);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+.page-heading em {
+  font-style: italic;
+  color: var(--gold);
+}
+
+.page-meta {
+  font-family: "DM Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 8px;
+}
+
+/* =========================================================
+   FILTER CARD
+========================================================= */
+.filter-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 16px 20px;
+  margin-bottom: 28px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  position: relative;
+  overflow: hidden;
+}
+.filter-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--gold),
+    var(--gold-light),
+    transparent
+  );
+}
+
+.filter-label {
+  font-family: "DM Mono", monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  flex-shrink: 0;
+}
+.filter-divider {
+  width: 1px;
+  height: 22px;
+  background: var(--border-mid);
+  flex-shrink: 0;
+}
+
+.filter-select {
+  padding: 10px 34px 10px 13px;
+  border-radius: var(--r);
+  border: 1px solid var(--border-mid);
+  background: var(--cream);
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  color: var(--ink);
+  outline: none;
+  cursor: pointer;
+  flex: 1 1 160px;
+  max-width: 280px;
+  min-width: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%237a7060' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 13px;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+.filter-select:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px var(--gold-pale);
+  background-color: var(--surface);
+}
+.filter-select option {
+  background: var(--surface);
+}
+
+.btn-apply {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 20px;
+  background: var(--ink);
+  color: var(--gold-light);
+  font-family: "DM Mono", monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  border: none;
+  border-radius: var(--r);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background 0.2s,
+    transform 0.2s var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-apply:hover {
+  background: var(--ink-3);
+  transform: translateY(-2px);
+}
+.btn-apply i {
+  font-size: 12px;
+}
+
+/* =========================================================
+   TIMETABLE CARD
+========================================================= */
+.tt-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 24px;
+  overflow: hidden;
+  animation: slideUp 0.4s ease both;
+}
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Card head */
+.tt-card-head {
+  background: var(--ink-2);
+  padding: 16px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  position: relative;
+}
+.tt-card-head::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--gold),
+    var(--gold-light),
+    transparent
+  );
+}
+.tt-card-head::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 22px;
+  right: 22px;
+  height: 1px;
+  background: rgba(184, 148, 63, 0.15);
+}
+
+.tt-card-title {
+  font-family: "Playfair Display", serif;
+  font-size: 17px;
+  font-weight: 700;
+  font-style: italic;
+  color: var(--cream);
+  letter-spacing: 0.01em;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tt-card-badge {
+  font-family: "DM Mono", monospace;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: rgba(184, 148, 63, 0.1);
+  border: 1px solid var(--gold-border);
+  padding: 3px 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   TABLE SCROLL WRAPPER
+========================================================= */
+.tt-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.tt-scroll::-webkit-scrollbar {
+  height: 3px;
+}
+.tt-scroll::-webkit-scrollbar-track {
+  background: var(--cream-2);
+}
+.tt-scroll::-webkit-scrollbar-thumb {
+  background: var(--gold);
+  border-radius: 99px;
+}
+
+/* =========================================================
+   TIMETABLE TABLE
+========================================================= */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 620px;
+}
+
+/* Header row */
+thead tr th {
+  background: var(--ink-3);
+  color: rgba(245, 240, 232, 0.55);
+  font-family: "DM Mono", monospace;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 11px 12px;
+  text-align: center;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  white-space: nowrap;
+}
+thead tr th:first-child {
+  text-align: center;
+  width: 80px;
+  min-width: 80px;
+  background: var(--ink-2);
+  color: var(--gold);
+  border-right: 1px solid rgba(184, 148, 63, 0.15);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+}
+thead tr th:last-child {
+  border-right: none;
+}
+
+/* Body rows */
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+tbody tr:last-child {
+  border-bottom: none;
+}
+tbody tr:hover {
+  background: var(--surface-2);
+}
+
+tbody tr td {
+  padding: 10px 12px;
+  text-align: center;
+  vertical-align: middle;
+  border-right: 1px solid var(--border);
+  min-width: 110px;
+}
+tbody tr td:last-child {
+  border-right: none;
+}
+
+/* DAY COLUMN — left side, properly styled */
+tbody tr td:first-child {
+  text-align: center;
+  width: 80px;
+  min-width: 80px;
+  background: var(--cream-2);
+  border-right: 1px solid var(--border-mid);
+  padding: 10px 8px;
+  position: relative;
+}
+.day-label-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+.day-short {
+  font-family: "Playfair Display", serif;
+  font-size: 15px;
+  font-weight: 700;
+  font-style: italic;
+  color: var(--ink);
+  line-height: 1;
+}
+.day-full {
+  font-family: "DM Mono", monospace;
+  font-size: 8px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  line-height: 1;
+}
+
+/* Alternating row tint */
+tbody tr:nth-child(even) td:first-child {
+  background: var(--cream-3);
+}
+
+/* =========================================================
+   CELL CONTENT
+========================================================= */
+.cell-busy {
+  background: var(--gold-dim);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--r);
+  padding: 7px 8px;
+  text-align: left;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+.cell-busy:hover {
+  border-color: rgba(184, 148, 63, 0.45);
+  box-shadow: 0 2px 10px var(--gold-pale);
+}
+
+.cell-subject {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--ink);
+  line-height: 1.3;
+  margin-bottom: 3px;
+}
+.cell-faculty {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--info);
+  line-height: 1.3;
+  margin-bottom: 3px;
+}
+.cell-room {
+  font-family: "DM Mono", monospace;
+  font-size: 10px;
+  color: var(--gold);
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  letter-spacing: 0.04em;
+}
+.cell-room::before {
+  content: "◈";
+  font-size: 8px;
+  color: var(--gold);
+}
+
+.cell-free {
+  color: var(--text-faint);
+  font-family: "DM Mono", monospace;
+  font-size: 10px;
+  font-style: italic;
+  letter-spacing: 0.05em;
+}
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+.empty-state {
+  text-align: center;
+  padding: 72px 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+}
+.empty-icon {
+  font-size: 40px;
+  margin-bottom: 16px;
+  opacity: 0.35;
+  display: block;
+}
+.empty-text {
+  font-family: "Playfair Display", serif;
+  font-size: 22px;
+  font-weight: 700;
+  font-style: italic;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+.empty-sub {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-weight: 300;
+  line-height: 1.7;
+}
+
+/* =========================================================
+   FOOTER STRIP
+========================================================= */
+.footer-strip {
+  text-align: center;
+  padding: 20px;
+  font-family: "DM Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  border-top: 1px solid var(--border);
+  margin-top: 20px;
+}
+
+/* =========================================================
+   PDF PRINT RULES
+========================================================= */
+@media print {
+  body {
+    padding-top: 0 !important;
+    background: white !important;
+    font-size: 8pt !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  body::before {
+    display: none;
+  }
+  .navbar,
+  .filter-card,
+  .page-head,
+  .footer-strip {
+    display: none !important;
+  }
+  .main {
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .tt-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    margin-bottom: 12pt !important;
+    box-shadow: none !important;
+    border: 1pt solid #ccc !important;
+    border-radius: 0 !important;
+    overflow: visible !important;
+  }
+  .tt-card + .tt-card {
+    page-break-before: always;
+  }
+
+  .tt-card-head {
+    background: #1a1a1a !important;
+    padding: 8px 14px !important;
+  }
+  .tt-card-head::before {
+    display: none;
+  }
+  .tt-card-title {
+    font-size: 11pt !important;
+  }
+  .tt-card-badge {
+    display: none;
+  }
+
+  .tt-scroll {
+    overflow: visible !important;
+  }
+  table {
+    min-width: 100% !important;
+    width: 100% !important;
+    table-layout: fixed;
+  }
+
+  thead tr th {
+    background: #2d2d2d !important;
+    font-size: 6pt !important;
+    padding: 4px 5px !important;
+    letter-spacing: 0 !important;
+  }
+  thead tr th:first-child {
+    background: #1a1a1a !important;
+  }
+
+  tbody tr td {
+    padding: 4px 6px !important;
+    min-width: auto !important;
+  }
+  tbody tr td:first-child {
+    background: #f0ece4 !important;
+  }
+  .day-short {
+    font-size: 9pt !important;
+  }
+  .day-full {
+    font-size: 5pt !important;
+  }
+  .cell-subject {
+    font-size: 6.5pt !important;
+  }
+  .cell-faculty {
+    font-size: 5.5pt !important;
+  }
+  .cell-room {
+    font-size: 5pt !important;
+  }
+  .cell-free {
+    font-size: 5.5pt !important;
+  }
+  .cell-busy {
+    padding: 3px 4px !important;
+    border-radius: 2px !important;
+  }
+}
+
+/* =========================================================
+   TABLET ≤ 900px
+========================================================= */
+@media (max-width: 900px) {
+  .main {
+    padding: 28px 16px 50px;
+  }
+
+  .page-heading {
+    font-size: 28px;
+    line-height: 1.15;
+  }
+
+  .filter-label,
+  .filter-divider {
+    display: none;
+  }
+
+  .filter-card {
+    gap: 10px;
+    padding: 16px;
+    flex-wrap: wrap;
+  }
+
+  .filter-select {
+    flex: 1 1 130px;
+    font-size: 13px;
+    height: 42px;
+    min-height: 42px;
+    padding: 0 14px;
+  }
+
+  .btn-apply {
+    height: 42px;
+    padding: 0 18px;
+    font-size: 12px;
+  }
+}
+
+/* =========================================================
+   MOBILE ≤ 600px
+========================================================= */
+@media (max-width: 600px) {
+  :root {
+    --nav-h: 80px;
+  }
+
+  /* ================= NAVBAR ================= */
+  .navbar {
+    padding: 0 14px;
+  }
+
+  .nav-sub {
+    display: none;
+  }
+
+  .nav-title {
+    font-size: 15px;
+  }
+
+  .nav-logo,
+  .nav-logo-badge {
+    width: 44px;
+    height: 44px;
+  }
+
+  .nav-right {
+    gap: 6px;
+  }
+
+  .btn {
+    padding: 7px 10px;
+    font-size: 10px;
+    gap: 5px;
+    min-height: 36px;
+  }
+
+  .btn i {
+    font-size: 11px;
+  }
+
+  .btn-label {
+    white-space: nowrap;
+  }
+
+  /* ================= MAIN ================= */
+  .main {
+    padding: 18px 12px 40px;
+  }
+
+  .page-head {
+    margin-bottom: 18px;
+  }
+
+  .page-heading {
+    font-size: 24px;
+    line-height: 1.15;
+  }
+
+  .page-meta {
+    font-size: 11px;
+  }
+
+  /* ================= FILTER ================= */
+ /* ================= FILTER ================= */
+.filter-card {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  padding: 14px;
+  border-radius: var(--r-md);
+}
+
+.filter-select {
+  width: 100%;
+  max-width: 100%;
+  height: 30px;
+  min-height: 30px;
+  max-height: 30px;
+  padding: 0 28px 0 8px;
+  font-size: 10px;
+  line-height: 30px;
+  border-radius: 5px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-position: right 8px center;
+  background-size: 10px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.filter-select option {
+  font-size: 11px;
+}
+
+.btn-apply {
+  width: 100%;
+  height: 34px;
+  justify-content: center;
+  font-size: 11px;
+}
+
+  /* ================= TIMETABLE CARD ================= */
+  .tt-card {
+    border-radius: var(--r-md);
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+
+  .tt-card-head {
+    padding: 12px 14px;
+  }
+
+  .tt-card-title {
+    font-size: 14px;
+    line-height: 1.3;
+  }
+
+  .tt-card-badge {
+    display: none;
+  }
+
+  /* ================= TABLE ================= */
+  .tt-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  table {
+    min-width: 500px;
+  }
+
+  thead tr th {
+    font-size: 8px;
+    padding: 9px 8px;
+    white-space: nowrap;
+  }
+
+  tbody tr td {
+    padding: 8px;
+    min-width: 90px;
+    vertical-align: top;
+  }
+
+  tbody tr td:first-child {
+    width: 64px;
+    min-width: 64px;
+    position: sticky;
+    left: 0;
+    z-index: 2;
+  }
+
+  /* ================= DAY LABEL ================= */
+  .day-label-cell {
+    gap: 2px;
+  }
+
+  .day-short {
+    font-size: 13px;
+    line-height: 1;
+  }
+
+  .day-full {
+    font-size: 7px;
+    line-height: 1.2;
+  }
+
+  /* ================= CELL CONTENT ================= */
+  .cell-subject {
+    font-size: 11px;
+    line-height: 1.35;
+  }
+
+  .cell-faculty {
+    font-size: 10px;
+    line-height: 1.4;
+  }
+
+  .cell-room {
+    font-size: 9px;
+  }
+
+  .cell-free {
+    font-size: 9px;
+  }
+
+  /* ================= FOOTER ================= */
+  .footer-strip {
+    font-size: 9px;
+    text-align: center;
+    line-height: 1.5;
+    padding: 12px 10px;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE ≤ 380px
+========================================================= */
+@media (max-width: 380px) {
+  .nav-title {
+    font-size: 14px;
+  }
+  .btn-label {
+    display: none;
+  }
+  .btn {
+    padding: 7px 11px;
+  }
+  .page-heading {
+    font-size: 20px;
+  }
+  table {
+    min-width: 460px;
+  }
+}

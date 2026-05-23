@@ -1,0 +1,554 @@
+{% load custom_tags %}
+{% load static %}
+{% load custom_filters %}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Timetable | TTGS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="{% static 'css/templates.css' %}">
+<link rel="stylesheet" href="{% static 'css/timetable.css' %}">
+<link rel="stylesheet" href="{% static 'css/chatbot.css' %}">
+<link rel="stylesheet" href="{% static 'css/footer.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+
+  <div class="logo-box">
+    <img src="{% static 'images/logo.png' %}">
+    <h2>TTGS Admin</h2>
+  </div>
+
+  <div class="menu">
+    <a href="{% url 'add_faculty' %}">Teachers</a>
+    <a href="{% url 'add_timeslot' %}">Timing</a>
+    <a href="{% url 'add_subject' %}">Subjects</a>
+    <a href="{% url 'add_department' %}">Departments</a>
+    <a href="{% url 'add_subject_faculty' %}">Assign Subject</a>
+    <a href="{% url 'add_subject_lab_room' %}">Assign Lab Room</a>
+    <a href="{% url 'add_classroom' %}">Classrooms</a>
+    <a href="{% url 'add_semester' %}">Semesters</a>
+    <a href="{% url 'generate' %}?auto=true">Generate Time Table</a>
+    <a href="{% url 'remove_timetable' %}?auto=true">Remove Time Table</a>
+    <a href="{% url 'timetable' %}" class="active">View Timetable</a>
+  </div>
+
+  <div class="bottom-links">
+    <hr style="margin:15px 0;border-color:rgba(255,255,255,0.2)">
+    <a href="{% url 'admin_dashboard' %}">🏠︎ Home</a>
+    <a href="{% url 'logout' %}">⏻ Logout</a>
+  </div>
+
+</div>
+
+<div class="overlay" id="overlay"></div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+
+    <div class="topbar-left">
+      <h2>Time Table</h2>
+    </div>
+
+    <div class="topbar-right">
+      <a href="{% url 'admin_dashboard' %}">🏠︎ Home</a>
+      <a href="{% url 'logout' %}">⏻ Logout</a>
+    </div>
+
+    <span class="menu-toggle" id="menuBtn" onclick="toggleMenu()">☰</span>
+
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- STATS -->
+    <div class="stats">
+
+      <div class="card-box">
+        <h4>Departments</h4>
+        <p>{{ departments|length }}</p>
+      </div>
+
+      <div class="card-box">
+        <h4>Semesters</h4>
+        <p>{{ semesters|length }}</p>
+      </div>
+
+      <div class="card-box">
+        <h4>Faculty</h4>
+        <p>{{ faculties|length }}</p>
+      </div>
+
+      <div class="card-box">
+        <h4>Subjects</h4>
+        <p>{{ subjects|length }}</p>
+      </div>
+
+    </div>
+
+    <!-- FILTER CARD -->
+    <div class="card">
+
+      <h3>View Timetable</h3>
+
+      <div class="view-toggle">
+
+        <button type="button" class="toggle-btn" id="todayBtn" onclick="showToday()">
+          📌 Today's Timetable
+        </button>
+
+        <button type="button" class="toggle-btn" id="filterBtn" onclick="showFilter()">
+          📅 View Full Timetable
+        </button>
+
+      </div>
+
+      <!-- FILTER -->
+      <div id="filterFormSection" style="display:none;">
+
+        <form method="GET" id="filterForm">
+
+          <input type="hidden" name="section" value="filter">
+
+          <label>Department</label>
+
+          <select name="department">
+
+            <option value="all">All Departments</option>
+
+            {% for dept in departments %}
+            <option value="{{ dept.id }}"
+              {% if dept.id|stringformat:"s" == selected_department %}selected{% endif %}>
+              {{ dept.name }}
+            </option>
+            {% endfor %}
+
+          </select>
+
+          <label>Semester</label>
+
+          <select name="semester">
+
+            <option value="all">All Semesters</option>
+
+            {% for sem in semesters %}
+            <option value="{{ sem.id }}"
+              {% if sem.id|stringformat:"s" == selected_semester %}selected{% endif %}>
+              {{ sem.department.name }} - Sem {{ sem.semester_number }}
+            </option>
+            {% endfor %}
+
+          </select>
+
+          <button type="submit" class="btn-apply">
+            Apply Filter ✔
+          </button>
+
+        </form>
+
+      </div>
+
+    </div>
+
+    <!-- TODAY SECTION -->
+    <div id="todaySection" style="display:none;">
+
+      <div class="today-wrapper">
+
+        <div class="today-banner">
+
+          <div class="day-nav nav-left">
+
+            <button class="nav-btn" id="prevBtn" onclick="changeDay(-1)">
+              &#8592;
+            </button>
+
+            <span class="nav-day-label" id="prevDayLabel"></span>
+
+          </div>
+
+          <div class="today-banner-day" id="bannerDayLabel">
+            TODAY
+          </div>
+
+          <div class="today-banner-title" id="bannerDayName">
+            🗓️ Wednesday's Classes
+          </div>
+
+          <div class="today-banner-badge" id="bannerBadge">
+            Total: 0 Classes
+          </div>
+
+          <div class="day-nav nav-right">
+
+            <span class="nav-day-label" id="nextDayLabel"></span>
+
+            <button class="nav-btn" id="nextBtn" onclick="changeDay(1)">
+              &#8594;
+            </button>
+
+          </div>
+
+        </div>
+
+        <div class="today-body-area">
+          <div id="todayBody"></div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- FULL TIMETABLE -->
+    <div id="fullSection" style="display:none;">
+
+      {% if grouped_data %}
+
+      <div class="table-card">
+
+        {% for title, group in grouped_data.items %}
+
+        <h3>{{ title }}</h3>
+
+        <table>
+
+          <thead>
+
+            <tr>
+
+              <th>Day</th>
+
+              {% for slot in slots %}
+              <th>{{ slot.start_time }} - {{ slot.end_time }}</th>
+              {% endfor %}
+
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+            {% for day in days %}
+
+            <tr>
+
+              <td><b>{{ day }}</b></td>
+
+              {% for slot in slots %}
+
+              <td class="editable-cell">
+
+                {% if slot.is_break %}
+
+                <div class="subject"><b>BREAK</b></div>
+
+                {% else %}
+
+                {% with time=slot.start_time|time:"H:i" %}
+                {% with key=day|add:"_"|add:time %}
+
+                {% if group.table|get_item:key %}
+
+                {% with entry=group.table|get_item:key %}
+
+                <div class="subject">{{ entry.subject.name }}</div>
+
+                <div class="faculty">
+
+                  {% for f in entry.faculty.all %}
+                  {{ f.name }}{% if not forloop.last %}, {% endif %}
+                  {% empty %}
+                  Not Assigned
+                  {% endfor %}
+
+                </div>
+
+                <div class="room">
+                  {{ entry.classroom.room_number }}
+                </div>
+
+                <div style="margin-top:10px;">
+
+                  <button class="btn-edit"
+                    onclick="openEditModal({{ entry.id }})"
+                    type="button">
+
+                    <i class="fa-solid fa-pen-to-square"></i> Edit
+
+                  </button>
+
+                  <button class="btn-delete"
+                    onclick="confirmDelete({{ entry.id }})"
+                    type="button">
+
+                    <i class="fa-solid fa-trash-can"></i> Delete
+
+                  </button>
+
+                </div>
+
+                {% endwith %}
+
+                {% else %}
+
+                <button class="btn-add"
+                  type="button"
+                  onclick="openAddModal('{{ day }}','{{ slot.start_time|time:"H:i" }}','{{ group.sem_id }}')">
+
+                  <i class="fa-solid fa-plus"></i> Add
+
+                </button>
+
+                {% endif %}
+
+                {% endwith %}
+                {% endwith %}
+
+                {% endif %}
+
+              </td>
+
+              {% endfor %}
+
+            </tr>
+
+            {% endfor %}
+
+          </tbody>
+
+        </table>
+
+        <br>
+
+        {% endfor %}
+
+      </div>
+
+      {% endif %}
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div id="ttModal" class="tt-modal">
+
+  <div class="tt-modal-content">
+
+    <div class="tt-modal-header">
+
+      <h2 id="modalTitle">
+        <i class="fa-solid fa-calendar-plus"></i>
+        Manage Timetable
+      </h2>
+
+      <button onclick="closeModal()" class="close-btn">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+    </div>
+
+    <div class="tt-modal-body">
+
+      <form id="ttForm">
+
+        <input type="hidden" id="entryId">
+        <input type="hidden" id="dayField">
+        <input type="hidden" id="slotField">
+        <input type="hidden" id="semesterField">
+
+        <label>Subject</label>
+
+        <select id="subjectField">
+          {% for sub in subjects %}
+          <option value="{{ sub.id }}">{{ sub.name }}</option>
+          {% endfor %}
+        </select>
+
+        <label>Faculty</label>
+
+        <select id="facultyField">
+          {% for f in all_faculties %}
+          <option value="{{ f.id }}">{{ f.name }}</option>
+          {% endfor %}
+        </select>
+
+        <label>Classroom</label>
+
+        <select id="roomField">
+          {% for room in rooms %}
+          <option value="{{ room.id }}">{{ room.room_number }}</option>
+          {% endfor %}
+        </select>
+
+      </form>
+
+    </div>
+
+    <div class="tt-modal-footer">
+
+      <button class="btn-modal-cancel" type="button" onclick="closeModal()">
+        Cancel
+      </button>
+
+      <button class="btn-modal-save" type="button" onclick="submitForm()">
+        <i class="fa-solid fa-floppy-disk"></i> Save
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- DELETE CONFIRM -->
+<div id="ttConfirm">
+
+  <div class="confirm-box">
+
+    <div class="confirm-icon">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+    </div>
+
+    <h3>Delete this class?</h3>
+
+    <p>This action cannot be undone.</p>
+
+    <div class="confirm-actions">
+
+      <button class="btn-confirm-no" onclick="closeConfirm()">
+        Cancel
+      </button>
+
+      <button class="btn-confirm-yes" id="confirmYesBtn">
+        <i class="fa-solid fa-trash-can"></i> Delete
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+
+        <footer class="site-footer">
+          <div class="footer-left">
+            © 2026 <strong>TTGS</strong>
+            — Timetable Generation System
+          </div>
+
+          <div class="footer-right">
+            <a href="{% url 'teams' %}">Developers</a>
+            |
+            <a href="{% url 'admin_dashboard' %}">Home</a>
+            |
+            <a href="{% url 'logout' %}"> Logout </a>
+          </div>
+        </footer>
+
+<!-- ─────────────────────────────
+   FLOATING CHATBOT
+───────────────────────────── -->
+
+    <div class="chatbot-wrapper">
+      <!-- FLOAT BUTTON -->
+      <button
+        class="chat-toggle-btn"
+        id="chatToggleBtn"
+        aria-label="Open chat assistant"
+      >
+        🤖
+      </button>
+
+      <!-- CHAT WINDOW -->
+      <div
+        class="chat-window"
+        id="chatWindow"
+        role="dialog"
+        aria-label="TTGS Assistant"
+      >
+        <!-- Header -->
+        <div class="cw-header">
+          <div class="cw-avatar">🤖</div>
+
+          <div class="cw-info">
+            <div class="cw-name">TTGS Assistant</div>
+            <div class="cw-status">
+              <div class="cw-status-dot"></div>
+              Online — always here to help
+            </div>
+          </div>
+
+          <div class="cw-header-actions">
+            <button class="cw-clear" id="cwClear" title="Clear chat">
+              Clear
+            </button>
+            <button class="cw-close" id="cwClose" aria-label="Close chat">✕</button>
+          </div>
+        </div>
+
+        <!-- Messages -->
+        <div class="cw-body" id="cwBody">
+          <div class="welcome-card">
+            <div class="wc-icon">👋</div>
+            <h4>Welcome to TTGS Assistant</h4>
+            <p>
+              Ask me anything about timetable generation, faculty,<br />subjects,
+              classrooms, semesters, and more!
+            </p>
+          </div>
+        </div>
+
+        <!-- Chatbot Footer -->
+        <div class="cw-footer">
+          <input
+            class="cw-input"
+            id="cwInput"
+            type="text"
+            placeholder="Type your question..."
+            autocomplete="off"
+            maxlength="300"
+          />
+          <button class="cw-send" id="cwSend" aria-label="Send message">➤</button>
+        </div>
+      </div>
+    </div>
+
+<!-- TOAST -->
+<div id="ttToast">
+  <i id="toastIcon" class="fa-solid fa-circle-check"></i>
+  <span id="toastMsg">Saved Successfully</span>
+</div>
+
+<!-- JSON DATA -->
+<script id="allSchedulesData" type="application/json">
+  {{ all_schedules_json|safe }}
+</script>
+
+<script>
+  const SERVER_SECTION = "{{ request.GET.section|default:'' }}";
+  const TODAY_NAME = "{{ today_name }}";
+</script>
+
+<script src="{% static 'js/toggle.js' %}"></script>
+<script src="{% static 'js/chatbot.js' %}"></script>
+<script src="{% static 'js/timetable.js' %}"></script>
+
+</body>
+</html>
