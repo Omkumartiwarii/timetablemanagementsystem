@@ -21,4 +21,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     # App routes
     path('', include('timetable_app.urls')),
+    path('chaining/', include('smart_selects.urls')),
 ]
