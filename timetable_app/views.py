@@ -11,6 +11,8 @@ from reportlab.lib import colors
 from django.db import models
 from django.utils.timezone import now
 from .models import RecentActivity
+from django.db import connection
+from django.db import close_old_connections
 
 from .models import (
     Department,
@@ -382,89 +384,197 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 
+from django.db import connection, close_old_connections
+
 from .models import (
     Department,
     Semester,
     Timetable,
     RecentActivity,
+    Faculty,
+    Classroom,
 )
 
 from .algorithms import (
     generate_all_timetables,
-    # generate_department_timetable,
-    # generate_single_semester_timetable,
+    generate_timetable,
+    assign_preferred_classrooms,
 )
 
 
 @login_required
 def generate_view(request):
+
+    # =========================
+    # SECURITY CHECK
+    # =========================
     if not (request.user.is_staff or request.user.is_superuser):
         return redirect('student_dashboard')
 
-    departments = Department.objects.all()
-    semesters = Semester.objects.all().order_by('department', 'semester_number')
-    faculties = Faculty.objects.all()
-    classrooms = Classroom.objects.all()
+    # =========================
+    # FIX DATABASE CONNECTION
+    # =========================
+    close_old_connections()
 
+    try:
+        connection.ensure_connection()
+    except Exception as e:
+        print("DB Connection Error:", e)
+
+    # =========================
+    # FETCH DATA
+    # =========================
+    departments = list(Department.objects.all())
+
+    semesters = list(
+        Semester.objects.all().order_by(
+            'department',
+            'semester_number'
+        )
+    )
+
+    faculties = list(Faculty.objects.all())
+
+    classrooms = list(Classroom.objects.all())
+
+    # =========================
+    # POST REQUEST
+    # =========================
     if request.method == "POST":
+
         generate_type = request.POST.get('generate_type')
         department_id = request.POST.get('department')
         semester_id = request.POST.get('semester')
 
         try:
+
+            # =====================================
+            # GENERATE ALL
+            # =====================================
             if generate_type == "all":
+
                 Timetable.objects.all().delete()
+
                 generate_all_timetables(semesters)
-                # RECENT ACTIVITY
 
                 RecentActivity.objects.create(
                     title="Generated all timetables successfully",
                     action_type='Generate'
                 )
-                messages.success(request, "All timetables generated successfully.")
 
+                messages.success(
+                    request,
+                    "All timetables generated successfully."
+                )
+
+            # =====================================
+            # GENERATE DEPARTMENT
+            # =====================================
             elif generate_type == "department":
-                department = get_object_or_404(Department, id=department_id)
-                department_semesters = Semester.objects.filter(department=department)
-                Timetable.objects.filter(semester__department=department).delete()
-                # fetch theory rooms once
-                theory_rooms = list(Classroom.objects.filter(is_lab=False))
-                # create preferred room mapping
-                preferred_map = assign_preferred_classrooms(department_semesters,theory_rooms)
+
+                department = get_object_or_404(
+                    Department,
+                    id=department_id
+                )
+
+                department_semesters = list(
+                    Semester.objects.filter(
+                        department=department
+                    )
+                )
+
+                Timetable.objects.filter(
+                    semester__department=department
+                ).delete()
+
+                theory_rooms = list(
+                    Classroom.objects.filter(is_lab=False)
+                )
+
+                preferred_map = assign_preferred_classrooms(
+                    department_semesters,
+                    theory_rooms
+                )
+
                 for sem in department_semesters:
+
+                    close_old_connections()
+
                     pref = preferred_map.get(sem.id, {})
-                    generate_timetable(sem,pref,theory_rooms)
-                # RECENT ACTIVITY
+
+                    generate_timetable(
+                        sem,
+                        pref,
+                        theory_rooms
+                    )
 
                 RecentActivity.objects.create(
-                    title=f"Generated timetable for {department.name} department",
+                    title=f"Generated timetable for {department.name}",
                     action_type='Generate'
                 )
-                messages.success(request, f"{department.name} timetable regenerated.")
 
+                messages.success(
+                    request,
+                    f"{department.name} timetable regenerated."
+                )
+
+            # =====================================
+            # GENERATE SEMESTER
+            # =====================================
             elif generate_type == "semester":
-                semester = get_object_or_404(Semester, id=semester_id)
-                Timetable.objects.filter(semester=semester).delete()
-                # fetch theory rooms
-                theory_rooms = list(Classroom.objects.filter(is_lab=False))
-                # create preferred mapping
+
+                semester = get_object_or_404(
+                    Semester,
+                    id=semester_id
+                )
+
+                Timetable.objects.filter(
+                    semester=semester
+                ).delete()
+
+                theory_rooms = list(
+                    Classroom.objects.filter(is_lab=False)
+                )
+
                 preferred_map = assign_preferred_classrooms(
                     [semester],
                     theory_rooms
                 )
+
                 pref = preferred_map.get(semester.id, {})
-                generate_timetable(semester,pref,theory_rooms)
-                # RECENT ACTIVITY
+
+                generate_timetable(
+                    semester,
+                    pref,
+                    theory_rooms
+                )
 
                 RecentActivity.objects.create(
                     title=f"Generated timetable for {semester}",
                     action_type='Generate'
                 )
-                messages.success(request, f"{semester} timetable regenerated.")
+
+                messages.success(
+                    request,
+                    f"{semester} timetable regenerated."
+                )
+
+            # =========================
+            # REDIRECT AFTER POST
+            # =========================
+            return redirect('generate')
 
         except Exception as e:
+
+            print("Generation Error:", e)
+
             messages.error(request, str(e))
 
+            return redirect('generate')
+
+    # =========================
+    # GET REQUEST
+    # =========================
     return render(request, 'generate.html', {
         'departments': departments,
         'semesters': semesters,

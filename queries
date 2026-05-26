@@ -1,0 +1,106 @@
+1. Saare Databases Dekho
+
+        SELECT datname FROM pg_database;
+
+2. Saare Tables Dekho
+
+        SELECT * FROM pg_tables
+        WHERE schemaname = 'public';
+
+3. Kisi Table Ka Data Dekho
+
+        SELECT * FROM public.timetable_app_department;
+
+4. Ordered Data
+
+        SELECT * FROM public.timetable_app_department
+        ORDER BY id ASC;
+
+5. Particular ID Ka Data
+
+        SELECT * FROM public.timetable_app_department
+        WHERE id = 3;
+
+6. Insert Data
+
+        INSERT INTO public.timetable_app_department(name)
+        VALUES ('AI & DS');
+
+7. Update Data
+
+        UPDATE public.timetable_app_department
+        SET name = 'Artificial Intelligence'
+        WHERE id = 3;
+
+8. Delete Data
+
+        DELETE FROM public.timetable_app_department
+        WHERE id = 3;
+
+9. Saara Data Delete
+
+        DELETE FROM public.timetable_app_department;
+
+10. Table Reset Completely
+
+        TRUNCATE TABLE public.timetable_app_department RESTART IDENTITY CASCADE;
+
+    CASCADE → related tables bhi clean karega.
+
+11. Total Rows Count
+
+        SELECT COUNT(*) FROM public.timetable_app_department;
+
+12. Faculty Table Dekho
+
+        SELECT * FROM public.timetable_app_faculty;
+
+13. Subject Table
+SELECT * FROM public.timetable_app_subject;
+14. Classroom Table
+SELECT * FROM public.timetable_app_classroom;
+15. Timeslot Table
+SELECT * FROM public.timetable_app_timeslot;
+16. Foreign Key Relation Example
+
+Subjects with Department:
+
+SELECT s.id, s.name, sem.semester_number, d.name
+FROM public.timetable_app_subject s
+JOIN public.timetable_app_semester sem
+ON s.semester_id = sem.id
+JOIN public.timetable_app_department d
+ON sem.department_id = d.id;
+17. Drop Table
+DROP TABLE public.timetable_app_department;
+18. Reset Full Database Tables
+TRUNCATE TABLE
+public.timetable_app_department,
+public.timetable_app_faculty,
+public.timetable_app_subject,
+public.timetable_app_semester
+RESTART IDENTITY CASCADE;
+19. PostgreSQL Connection Test
+SELECT version();
+20. Current Database Name
+SELECT current_database();
+21. Current User
+SELECT current_user;
+22. All Columns of Table
+SELECT column_name, data_type
+FROM information_schema.columns
+WHERE table_name = 'timetable_app_department';
+23. Find Duplicate Rows
+SELECT name, COUNT(*)
+FROM public.timetable_app_department
+GROUP BY name
+HAVING COUNT(*) > 1;
+24. Delete Duplicate Rows
+DELETE FROM public.timetable_app_department a
+USING public.timetable_app_department b
+WHERE a.id < b.id
+AND a.name = b.name;
+25. Full Reset + Seed Workflow
+python manage.py flush
+python manage.py migrate
+python manage.py seed

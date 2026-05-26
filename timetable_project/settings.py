@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECRET_KEY = os.environ.get('SECRET_KEY')
-SECRET_KEY = os.environ.get('SECRET_KEY', 'unsafe-secret-key-for-dev')
+SECRET_KEY = os.environ.get('SECRET_KEY', '_&iv8@1$gr9hc0t!lrs$y*jjhk#hctw-hxnx&i^ku8sq(rt#vn')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -97,10 +97,13 @@ WSGI_APPLICATION = 'timetable_project.wsgi.application'
 # }
 
 import dj_database_url
+import os
 
 DATABASES = {
-    'default': dj_database_url.parse(
-        os.environ.get("DATABASE_URL")
+    'default': dj_database_url.config(
+        default=os.environ.get("DATABASE_URL"),
+        conn_max_age=600,
+        ssl_require=False
     )
 }
 
