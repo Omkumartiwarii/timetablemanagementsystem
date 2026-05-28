@@ -1,10 +1,47 @@
 from django.db import models
 
 # =========================
+# DUAL DATABASE BASE MODEL
+# =========================
+
+class DualDatabaseModel(models.Model):
+
+    class Meta:
+        abstract = True
+
+    def save(self, *args, **kwargs):
+
+        using = kwargs.pop('using', None)
+
+        # agar manually database diya gaya hai
+        if using:
+            return super().save(using=using, *args, **kwargs)
+
+        # SQLite save
+        super().save(using='default', *args, **kwargs)
+
+        # PostgreSQL save
+        super().save(using='postgresql', *args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+
+        using = kwargs.pop('using', None)
+
+        if using:
+            return super().delete(using=using, *args, **kwargs)
+
+        # SQLite delete
+        super().delete(using='default', *args, **kwargs)
+
+        # PostgreSQL delete
+        super().delete(using='postgresql', *args, **kwargs)
+        
+
+# =========================
 # RECENT ACTIVITY
 # =========================
 
-class RecentActivity(models.Model):
+class RecentActivity(DualDatabaseModel):
 
     ACTION_TYPES = (
         ('Department', 'Department'),
@@ -45,7 +82,7 @@ class RecentActivity(models.Model):
 # =========================
 # Department
 # =========================
-class Department(models.Model):
+class Department(DualDatabaseModel):
     name = models.CharField(max_length=100)
 
     def __str__(self):
@@ -55,7 +92,7 @@ class Department(models.Model):
 # =========================
 # Semester
 # =========================
-class Semester(models.Model):
+class Semester(DualDatabaseModel):
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
     semester_number = models.IntegerField()
 
@@ -66,7 +103,7 @@ class Semester(models.Model):
 # =========================
 # Faculty (FINAL - only one)
 # =========================
-class Faculty(models.Model):
+class Faculty(DualDatabaseModel):
     name = models.CharField(max_length=100)
     email = models.EmailField(blank=True,null=True)
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
@@ -78,7 +115,7 @@ class Faculty(models.Model):
 # =========================
 # Subject
 # =========================
-class Subject(models.Model):
+class Subject(DualDatabaseModel):
     name = models.CharField(max_length=100)
 
     semester = models.ForeignKey(
@@ -122,7 +159,7 @@ class Subject(models.Model):
             elif self.credits == 3:
                 self.weekly_lab_sessions = 2
 
-        super().save(*args,**kwargs)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         lab_tag = " [Lab]" if self.is_lab else ""
@@ -133,7 +170,7 @@ class Subject(models.Model):
 # Subject-Faculty Mapping
 # =========================
 from django.core.exceptions import ValidationError
-class SubjectFaculty(models.Model):
+class SubjectFaculty(DualDatabaseModel):
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     faculty = models.ForeignKey(Faculty, on_delete=models.CASCADE)
 
@@ -162,7 +199,7 @@ class SubjectFaculty(models.Model):
 # =========================
 # Classroom
 # =========================
-class Classroom(models.Model):
+class Classroom(DualDatabaseModel):
 
     room_number = models.CharField(
         max_length=100
@@ -180,7 +217,7 @@ class Classroom(models.Model):
 # =========================
 # TimeSlot
 # =========================
-class TimeSlot(models.Model):
+class TimeSlot(DualDatabaseModel):
 
     DAY_CHOICES = [
         ('Monday', 'Monday'),
@@ -221,7 +258,7 @@ class TimeSlot(models.Model):
 # =========================
 # Timetable
 # =========================
-class Timetable(models.Model):
+class Timetable(DualDatabaseModel):
     semester = models.ForeignKey(Semester, on_delete=models.CASCADE)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     faculty = models.ManyToManyField(Faculty)
@@ -234,7 +271,7 @@ class Timetable(models.Model):
 # ----------------------------
 # subject lab Room mapping
 # ==========================
-class SubjectLabRoom(models.Model):
+class SubjectLabRoom(DualDatabaseModel):
 
     subject = models.ForeignKey(
         Subject,
