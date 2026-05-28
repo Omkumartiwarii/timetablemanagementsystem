@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 
 # =========================
 # DUAL DATABASE BASE MODEL
@@ -13,15 +14,41 @@ class DualDatabaseModel(models.Model):
 
         using = kwargs.pop('using', None)
 
-        # agar manually database diya gaya hai
+        # Agar manually DB specify kiya gaya ho
         if using:
             return super().save(using=using, *args, **kwargs)
 
-        # SQLite save
+        # -------------------------
+        # SQLITE SAVE
+        # -------------------------
         super().save(using='default', *args, **kwargs)
 
-        # PostgreSQL save
-        super().save(using='postgresql', *args, **kwargs)
+        # Current PK preserve
+        sqlite_pk = self.pk
+
+        # -------------------------
+        # POSTGRESQL SAVE
+        # -------------------------
+        try:
+            existing = self.__class__.objects.using('postgresql').filter(
+                id=sqlite_pk
+            ).first()
+
+            if existing:
+                # UPDATE EXISTING
+                self.pk = sqlite_pk
+                super().save(using='postgresql', *args, **kwargs)
+
+            else:
+                # CREATE NEW
+                self.pk = sqlite_pk
+                super().save(using='postgresql', force_insert=True, *args, **kwargs)
+
+        except Exception as e:
+            print("PostgreSQL Save Error:", e)
+
+        # restore pk
+        self.pk = sqlite_pk
 
     def delete(self, *args, **kwargs):
 
@@ -30,12 +57,24 @@ class DualDatabaseModel(models.Model):
         if using:
             return super().delete(using=using, *args, **kwargs)
 
-        # SQLite delete
-        super().delete(using='default', *args, **kwargs)
+        current_pk = self.pk
 
-        # PostgreSQL delete
-        super().delete(using='postgresql', *args, **kwargs)
-        
+        # SQLITE DELETE
+        try:
+            self.__class__.objects.using('default').filter(
+                pk=current_pk
+            ).delete()
+        except Exception as e:
+            print("SQLite Delete Error:", e)
+
+        # POSTGRESQL DELETE
+        try:
+            self.__class__.objects.using('postgresql').filter(
+                pk=current_pk
+            ).delete()
+        except Exception as e:
+            print("PostgreSQL Delete Error:", e)
+
 
 # =========================
 # RECENT ACTIVITY
@@ -58,9 +97,7 @@ class RecentActivity(DualDatabaseModel):
         ('Add', 'Add'),
     )
 
-    title = models.CharField(
-        max_length=255
-    )
+    title = models.CharField(max_length=255)
 
     action_type = models.CharField(
         max_length=100,
@@ -68,9 +105,7 @@ class RecentActivity(DualDatabaseModel):
         default='Add'
     )
 
-    created_at = models.DateTimeField(
-        auto_now_add=True
-    )
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['-created_at']
@@ -82,7 +117,9 @@ class RecentActivity(DualDatabaseModel):
 # =========================
 # Department
 # =========================
+
 class Department(DualDatabaseModel):
+
     name = models.CharField(max_length=100)
 
     def __str__(self):
@@ -92,8 +129,14 @@ class Department(DualDatabaseModel):
 # =========================
 # Semester
 # =========================
+
 class Semester(DualDatabaseModel):
-    department = models.ForeignKey(Department, on_delete=models.CASCADE)
+
+    department = models.ForeignKey(
+        Department,
+        on_delete=models.CASCADE
+    )
+
     semester_number = models.IntegerField()
 
     def __str__(self):
@@ -101,12 +144,22 @@ class Semester(DualDatabaseModel):
 
 
 # =========================
-# Faculty (FINAL - only one)
+# Faculty
 # =========================
+
 class Faculty(DualDatabaseModel):
+
     name = models.CharField(max_length=100)
-    email = models.EmailField(blank=True,null=True)
-    department = models.ForeignKey(Department, on_delete=models.CASCADE)
+
+    email = models.EmailField(
+        blank=True,
+        null=True
+    )
+
+    department = models.ForeignKey(
+        Department,
+        on_delete=models.CASCADE
+    )
 
     def __str__(self):
         return self.name
@@ -115,7 +168,9 @@ class Faculty(DualDatabaseModel):
 # =========================
 # Subject
 # =========================
+
 class Subject(DualDatabaseModel):
+
     name = models.CharField(max_length=100)
 
     semester = models.ForeignKey(
@@ -123,36 +178,31 @@ class Subject(DualDatabaseModel):
         on_delete=models.CASCADE
     )
 
-    credits = models.IntegerField(
-        default=3
-    )
+    credits = models.IntegerField(default=3)
 
     lectures_per_week = models.IntegerField(
         blank=True,
         null=True
     )
 
-    is_lab = models.BooleanField(
-        default=False
-    )
+    is_lab = models.BooleanField(default=False)
 
     weekly_lab_sessions = models.IntegerField(
         blank=True,
         null=True
     )
 
-    lab_duration = models.IntegerField(
-        default=2
-    )
+    lab_duration = models.IntegerField(default=2)
 
-    def save(self,*args,**kwargs):
+    def save(self, *args, **kwargs):
 
-        # theory from credits
+        # THEORY
         if not self.is_lab:
             self.lectures_per_week = self.credits
 
-        # lab from credits
+        # LAB
         else:
+
             if self.credits == 2:
                 self.weekly_lab_sessions = 1
 
@@ -162,21 +212,36 @@ class Subject(DualDatabaseModel):
         super().save(*args, **kwargs)
 
     def __str__(self):
+
         lab_tag = " [Lab]" if self.is_lab else ""
-        return f"{self.id} | {self.name} | {self.semester.department.name} Sem {self.semester.semester_number}{lab_tag}"
+
+        return (
+            f"{self.id} | "
+            f"{self.name} | "
+            f"{self.semester.department.name} "
+            f"Sem {self.semester.semester_number}"
+            f"{lab_tag}"
+        )
 
 
 # =========================
-# Subject-Faculty Mapping
+# Subject Faculty Mapping
 # =========================
-from django.core.exceptions import ValidationError
+
 class SubjectFaculty(DualDatabaseModel):
-    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
-    faculty = models.ForeignKey(Faculty, on_delete=models.CASCADE)
+
+    subject = models.ForeignKey(
+        Subject,
+        on_delete=models.CASCADE
+    )
+
+    faculty = models.ForeignKey(
+        Faculty,
+        on_delete=models.CASCADE
+    )
 
     def clean(self):
 
-        # subject not selected yet
         if not self.subject_id:
             return
 
@@ -199,24 +264,23 @@ class SubjectFaculty(DualDatabaseModel):
 # =========================
 # Classroom
 # =========================
+
 class Classroom(DualDatabaseModel):
 
-    room_number = models.CharField(
-        max_length=100
-    )
+    room_number = models.CharField(max_length=100)
 
     capacity = models.IntegerField(default=60)
 
-    is_lab = models.BooleanField(
-        default=False
-    )
+    is_lab = models.BooleanField(default=False)
 
     def __str__(self):
         return self.room_number
 
+
 # =========================
 # TimeSlot
 # =========================
+
 class TimeSlot(DualDatabaseModel):
 
     DAY_CHOICES = [
@@ -247,9 +311,7 @@ class TimeSlot(DualDatabaseModel):
 
     order = models.IntegerField(default=1)
 
-    is_break = models.BooleanField(
-        default=False
-    )
+    is_break = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.day} ({self.start_time} - {self.end_time})"
@@ -258,19 +320,44 @@ class TimeSlot(DualDatabaseModel):
 # =========================
 # Timetable
 # =========================
+
 class Timetable(DualDatabaseModel):
-    semester = models.ForeignKey(Semester, on_delete=models.CASCADE)
-    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+
+    semester = models.ForeignKey(
+        Semester,
+        on_delete=models.CASCADE
+    )
+
+    subject = models.ForeignKey(
+        Subject,
+        on_delete=models.CASCADE
+    )
+
     faculty = models.ManyToManyField(Faculty)
-    classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE)
-    timeslot = models.ForeignKey(TimeSlot, on_delete=models.CASCADE)
+
+    classroom = models.ForeignKey(
+        Classroom,
+        on_delete=models.CASCADE
+    )
+
+    timeslot = models.ForeignKey(
+        TimeSlot,
+        on_delete=models.CASCADE
+    )
 
     def __str__(self):
-        return f"{self.subject.name} | {self.timeslot.day} | {self.timeslot.start_time}"
-    
-# ----------------------------
-# subject lab Room mapping
-# ==========================
+
+        return (
+            f"{self.subject.name} | "
+            f"{self.timeslot.day} | "
+            f"{self.timeslot.start_time}"
+        )
+
+
+# =========================
+# Subject Lab Room
+# =========================
+
 class SubjectLabRoom(DualDatabaseModel):
 
     subject = models.ForeignKey(
@@ -286,6 +373,7 @@ class SubjectLabRoom(DualDatabaseModel):
     )
 
     def __str__(self):
+
         subject_name = (
             self.subject.name
             if self.subject
@@ -297,4 +385,5 @@ class SubjectLabRoom(DualDatabaseModel):
             if self.classroom
             else "No Room"
         )
+
         return f"{subject_name} -> {room_name}"
