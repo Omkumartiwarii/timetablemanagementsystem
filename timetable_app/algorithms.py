@@ -385,7 +385,6 @@ def generate_timetable(semester, preferred_rooms, theory_rooms):
 
         if p == 0:
             break
-
     if not best_schedule:
         raise Exception(f"No feasible timetable for {semester}")
 

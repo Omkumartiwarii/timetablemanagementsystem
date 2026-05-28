@@ -100,13 +100,33 @@ import dj_database_url
 import os
 
 DATABASES = {
+<<<<<<< HEAD
     'default': dj_database_url.config(
         default=os.environ.get("DATABASE_URL"),
         conn_max_age=600,
         ssl_require=False
     )
+=======
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    },
+
+    # 'postgres_db': {
+    #     'ENGINE': 'django.db.backends.postgresql',
+    #     'NAME': 'timetable_db',
+    #     'USER': 'postgres',
+    #     'PASSWORD': 'postgresql#108@',
+    #     'HOST': 'localhost',
+    #     'PORT': '5432',
+    # }
+>>>>>>> f9556268 (updated)
 }
 
+# 👇 YEH ADD KARO
+# DATABASE_ROUTERS = [
+#     'timetable_project.database_router.TimetableRouter'
+# ]
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators

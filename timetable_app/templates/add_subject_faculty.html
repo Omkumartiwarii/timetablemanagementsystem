@@ -11,8 +11,10 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="{% static 'css/templates.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/chatbot.css' %}" />
   </head>
   <script>
+<<<<<<< HEAD
 
 document.addEventListener("DOMContentLoaded", function () {
 
@@ -37,6 +39,22 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 </script>
+=======
+    document.addEventListener("DOMContentLoaded", function () {
+      const department = document.getElementById("id_department");
+
+      const semester = document.getElementById("id_semester");
+
+      department.addEventListener("change", function () {
+        semester.form.submit();
+      });
+
+      semester.addEventListener("change", function () {
+        semester.form.submit();
+      });
+    });
+  </script>
+>>>>>>> f9556268 (updated)
   <body>
     <!-- SIDEBAR -->
     <div class="sidebar">
@@ -50,7 +68,13 @@ document.addEventListener("DOMContentLoaded", function () {
         <a href="{% url 'add_timeslot' %}">Timing</a>
         <a href="{% url 'add_subject' %}">Subjects</a>
         <a href="{% url 'add_department' %}">Departments</a>
+<<<<<<< HEAD
         <a href="{% url 'add_subject_faculty' %}" class="active">Assign Subject </a>
+=======
+        <a href="{% url 'add_subject_faculty' %}" class="active"
+          >Assign Subject
+        </a>
+>>>>>>> f9556268 (updated)
         <a href="{% url 'add_subject_lab_room' %}">Assign Lab Room</a>
         <a href="{% url 'add_classroom' %}">Classrooms </a>
         <a href="{% url 'add_semester' %}">Semesters </a>
@@ -119,6 +143,7 @@ document.addEventListener("DOMContentLoaded", function () {
           <h3>📘 Assign Subject to Faculty</h3>
 
           <form method="post" class="subject-faculty-form">
+<<<<<<< HEAD
 
     {% csrf_token %}
 
@@ -151,6 +176,36 @@ document.addEventListener("DOMContentLoaded", function () {
     </button>
 
 </form>
+=======
+            {% csrf_token %}
+
+            <!-- Department -->
+            <div class="form-group">
+              <label>Department</label>
+              {{ form.department }}
+            </div>
+
+            <!-- Semester -->
+            <div class="form-group">
+              <label>Semester</label>
+              {{ form.semester }}
+            </div>
+
+            <!-- Subject -->
+            <div class="form-group">
+              <label>Subject</label>
+              {{ form.subject }}
+            </div>
+
+            <!-- Faculty -->
+            <div class="form-group">
+              <label>Faculty</label>
+              {{ form.faculty }}
+            </div>
+
+            <button type="submit" class="btn">Assign</button>
+          </form>
+>>>>>>> f9556268 (updated)
           <!-- VIEW BUTTON -->
           <!-- <div style="margin-top: 20px">
             <a href="?view_list=true" class="btn"> View Assignments </a>
@@ -245,6 +300,79 @@ document.addEventListener("DOMContentLoaded", function () {
         </div>
       </div>
     </div>
+
+    <!-- ─────────────────────────────
+   FLOATING CHATBOT
+───────────────────────────── -->
+
+    <div class="chatbot-wrapper">
+      <!-- FLOAT BUTTON -->
+      <button
+        class="chat-toggle-btn"
+        id="chatToggleBtn"
+        aria-label="Open chat assistant"
+      >
+        🤖
+      </button>
+
+      <!-- CHAT WINDOW -->
+      <div
+        class="chat-window"
+        id="chatWindow"
+        role="dialog"
+        aria-label="TTGS Assistant"
+      >
+        <!-- Header -->
+        <div class="cw-header">
+          <div class="cw-avatar">🤖</div>
+
+          <div class="cw-info">
+            <div class="cw-name">TTGS Assistant</div>
+            <div class="cw-status">
+              <div class="cw-status-dot"></div>
+              Online — always here to help
+            </div>
+          </div>
+
+          <div class="cw-header-actions">
+            <button class="cw-clear" id="cwClear" title="Clear chat">
+              Clear
+            </button>
+            <button class="cw-close" id="cwClose" aria-label="Close chat">
+              ✕
+            </button>
+          </div>
+        </div>
+
+        <!-- Messages -->
+        <div class="cw-body" id="cwBody">
+          <div class="welcome-card">
+            <div class="wc-icon">👋</div>
+            <h4>Welcome to TTGS Assistant</h4>
+            <p>
+              Ask me anything about timetable generation, faculty,<br />subjects,
+              classrooms, semesters, and more!
+            </p>
+          </div>
+        </div>
+
+        <!-- Chatbot Footer -->
+        <div class="cw-footer">
+          <input
+            class="cw-input"
+            id="cwInput"
+            type="text"
+            placeholder="Type your question..."
+            autocomplete="off"
+            maxlength="300"
+          />
+          <button class="cw-send" id="cwSend" aria-label="Send message">
+            ➤
+          </button>
+        </div>
+      </div>
+    </div>
     <script src="{% static 'js/all-js.js' %}"></script>
+    <script src="{% static 'JS/chatbot.js' %}"></script>
   </body>
 </html>
