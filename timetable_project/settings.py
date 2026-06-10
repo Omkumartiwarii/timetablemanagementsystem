@@ -105,9 +105,9 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-# DATABASE_ROUTERS = [
-#     'timetable_project.database_router.TimetableRouter'
-# ]
+ DATABASE_ROUTERS = [
+     'timetable_project.database_router.TimetableRouter'
+ ]
 
 
 # Password validation
