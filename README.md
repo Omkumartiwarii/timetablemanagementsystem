@@ -1,57 +1,87 @@
-1. Data Fetching Issue
+# Timetable Management System
 
-    Description:
-        The timetable data stored in the database is not being displayed on the student dashboard or admin dashboard timetable.
+A web-based **Timetable Management System** built with **Django** that automates timetable generation for educational institutions. The system helps administrators manage departments, semesters, subjects, faculty assignments, classrooms, and time slots while generating conflict-free class schedules.
 
-    Symptoms:
-        Dashboard loads successfully
-        No timetable data appears despite existing records
+---
 
-    Possible Causes:
-        Incorrect or missing queryset (timetable_qs) in the backend
-        Improper filtering logic
-        Template not rendering the correct context variables
+## 📌 Overview
 
-2. Department & Semester Filtering Not Working
+Managing academic timetables manually is time-consuming and prone to scheduling conflicts. This project provides an automated solution that:
 
-    Description:
-        Selecting a department or semester does not update the timetable dynamically.
+- Generates timetables automatically
+- Manages faculty, subjects, classrooms, and semesters
+- Prevents timetable clashes
+- Supports theory and laboratory sessions
+- Provides separate dashboards for administrators, faculty, and students
+- Allows timetable viewing and PDF export
 
-    Symptoms:
-        Dropdown selection has no effect
-        Same (or empty) timetable is displayed
+---
 
-    Possible Causes:
-        Form data not being submitted correctly (GET/POST issue)
-        Selected values not passed to backend
-        Incorrect filtering logic in view
+## 🚀 Features
 
-3. PDF Download Feature Not Working
+### Admin Module
+- Department Management
+- Semester Management
+- Faculty Management
+- Subject Management
+- Classroom & Lab Management
+- Time Slot Management
+- Subject-Faculty Assignment
+- Lab Room Assignment
+- Recent Activity Tracking
+- Automatic Timetable Generation
+- Edit/Delete Timetable Entries
 
-    Description:
-        The "Download PDF" button is present but not functional.
+### Faculty Module
+- Faculty Login
+- View Today's Schedule
+- View Weekly Timetable
+- Assigned Subject Tracking
 
-    Possible Causes:
-        Missing backend implementation
-        JavaScript function not properly defined
+### Student Module
+- Student Access Dashboard
+- Department-wise Timetable View
+- Semester-wise Timetable View
+- Download Timetable as PDF
 
+### Timetable Generation Engine
+- Automatic schedule generation
+- Faculty conflict prevention
+- Classroom conflict prevention
+- Semester conflict prevention
+- Theory and Lab session support
+- Room allocation optimization
+- Faculty workload balancing
 
-⚠️ Timetable Generation Algorithm Issue:
-    1. Weekly Class Limit Violation:
-    
-        The algorithm does not properly enforce the limit of maximum 3 classes per subject per week, resulting in over-allocation and an unbalanced timetable.
+---
 
-    2. Duplicate Subject in a Day
+## 🏗️ System Architecture
 
-        A subject is sometimes scheduled more than once in a single day, which violates the rule of one class per subject per day and reduces timetable quality.
+### Core Entities
 
-    3. Incomplete Data Fetching
+- Department
+- Semester
+- Faculty
+- Subject
+- Subject Faculty Mapping
+- Classroom
+- Time Slot
+- Timetable
+- Lab Room Mapping
 
-        The system fails to retrieve full data from the database, leading to partial timetable generation with missing subjects and fewer classes.
+### Relationships
 
-📌 Summary
-    ❌ Weekly constraints not enforced
-    ❌ Duplicate subject allocation in a day
-    ❌ Incomplete data retrieval
+```text
+Department
+    └── Semester
+            └── Subject
+                    └── Faculty
 
-➡️ Result: The generated timetable is inconsistent, incomplete, and unreliable
+Semester
+    └── Timetable
+
+Classroom
+    └── Timetable
+
+TimeSlot
+    └── Timetable
